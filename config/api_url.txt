@@ -1,0 +1,1 @@
+https://calorietracker.moezzadigital.com/api/analyze.php

@@ -7,8 +7,13 @@ header('Content-Type: application/json; charset=utf-8');
 
 function out($code, $data) { http_response_code($code); echo json_encode($data); exit; }
 
-$cfgFile = dirname(__DIR__, 2) . '/aicc-config.php';
-if (!file_exists($cfgFile)) out(500, ['error' => 'Server setup not finished (aicc-config.php missing).']);
+// aicc-config.php sits in your home folder (next to public_html). Works for the main
+// domain and for subdomains, whose folder can be inside or outside public_html.
+$cfgFile = '';
+foreach ([dirname(__DIR__, 2), dirname(__DIR__, 3), dirname(__DIR__, 4)] as $d) {
+  if (is_file($d . '/aicc-config.php')) { $cfgFile = $d . '/aicc-config.php'; break; }
+}
+if (!$cfgFile) out(500, ['error' => 'Server setup not finished (aicc-config.php missing).']);
 $cfg = require $cfgFile;
 $GEMINI_KEY = $cfg['GEMINI_API_KEY'] ?? '';
 $FIREBASE_KEY = $cfg['FIREBASE_API_KEY'] ?? '';
@@ -40,7 +45,7 @@ $uid = $u['users'][0]['localId'] ?? '';
 if ($c !== 200 || !$uid) out(401, ['error' => 'Please sign in again.']);
 
 // 2) daily limit per user (stored in a private folder above public_html)
-$dir = dirname(__DIR__, 2) . '/aicc-usage';
+$dir = dirname($cfgFile) . '/aicc-usage';
 if (!is_dir($dir)) @mkdir($dir, 0700, true);
 $day = gmdate('Y-m-d', time() + 19800);
 $f = $dir . '/' . preg_replace('/[^A-Za-z0-9_-]/', '', $uid) . '_' . $day;
