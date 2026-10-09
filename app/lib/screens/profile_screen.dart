@@ -6,6 +6,7 @@ import '../services/db.dart';
 import '../services/device.dart';
 import '../theme.dart';
 import '../widgets/graphics.dart';
+import '../widgets/premium.dart';
 import '../widgets/ui.dart';
 import 'onboarding_screen.dart';
 
@@ -143,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const H2('Your body'),
           const SizedBox(height: 8),
-          BmiGauge(weightKg: prof.weightKg, heightCm: prof.heightCm),
+          BmiCard(weightKg: prof.weightKg, heightCm: prof.heightCm),
           const SizedBox(height: 8),
           kv('Age', '${prof.age} yrs'),
           kv('Height', '${prof.heightCm.round()} cm'),

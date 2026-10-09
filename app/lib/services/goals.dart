@@ -218,3 +218,56 @@ Score weekScore(List<DayLog> newestFirst, Profile p) {
   if (s >= 40) return ('Fair', (p) => p.saffron);
   return ('Needs work', (p) => p.chili);
 }
+
+// ---------------- weight plan maths (same as the website) ----------------
+const double kcalPerKg = 7700; // about 7,700 kcal in 1 kg of body fat
+const _actF = {'low': 1.2, 'light': 1.375, 'moderate': 1.55, 'high': 1.725};
+
+double bmrOf(Profile p, double weightKg) =>
+    10 * weightKg + 6.25 * p.heightCm - 5 * p.age + (p.sex == 'female' ? -161 : 5);
+
+double tdeeOf(Profile p, double weightKg) => bmrOf(p, weightKg) * (_actF[p.activity] ?? 1.375);
+
+/// Everything the Goal progress and weight plan cards need.
+class GoalMath {
+  final bool lose, wrongSide;
+  final double start, cur, target, totalKg, leftKg, doneKg, pct;
+  final int daysLeft;
+  final double needed, perWeek, tdee, fromFood, fromMove;
+  final double? realPace;
+  GoalMath._(this.lose, this.wrongSide, this.start, this.cur, this.target, this.totalKg, this.leftKg,
+      this.doneKg, this.pct, this.daysLeft, this.needed, this.perWeek, this.tdee, this.fromFood,
+      this.fromMove, this.realPace);
+
+  static GoalMath? of(Profile p, List<WeightEntry> ws) {
+    if (p.goal == 'maintain' || p.targetWeightKg <= 0) return null;
+    final lose = p.goal == 'lose';
+    final start = ws.isNotEmpty ? ws.first.kg : p.weightKg;
+    final cur = ws.isNotEmpty ? ws.last.kg : p.weightKg;
+    final target = p.targetWeightKg;
+    final wrong = lose ? start <= target : start >= target;
+    final total = (start - target).abs();
+    final left = math.max(0.0, lose ? cur - target : target - cur);
+    final done = (total - left).clamp(0.0, total).toDouble();
+    final pct = wrong ? 0.0 : (total > 0 ? (done / total * 100).clamp(0.0, 100.0).toDouble() : 100.0);
+    int days;
+    final td = p.targetDate.isNotEmpty ? DateTime.tryParse(p.targetDate) : null;
+    if (td != null) {
+      final now = DateTime.now();
+      days = math.max(1, DateTime(td.year, td.month, td.day).difference(DateTime(now.year, now.month, now.day)).inDays);
+    } else {
+      days = math.max(1, (left / (lose ? 0.5 : 0.25) * 7).ceil());
+    }
+    final needed = left * kcalPerKg / days;
+    final tdee = tdeeOf(p, cur);
+    final foodPart = math.max(0.0, lose ? tdee - p.goals.kcal : p.goals.kcal - tdee);
+    final fromFood = math.min(needed, foodPart), fromMove = math.max(0.0, needed - fromFood);
+    double? real;
+    if (ws.length > 1) {
+      final span = DateTime.parse(ws.last.date).difference(DateTime.parse(ws.first.date)).inDays;
+      if (span >= 7) real = (lose ? start - cur : cur - start) / (span / 7);
+    }
+    return GoalMath._(lose, wrong, start, cur, target, total, left, done, pct, days, needed,
+        needed * 7 / kcalPerKg, tdee, fromFood, fromMove, real);
+  }
+}

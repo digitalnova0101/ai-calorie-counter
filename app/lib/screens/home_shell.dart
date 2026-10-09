@@ -4,6 +4,7 @@ import '../models.dart';
 import '../theme.dart';
 import '../widgets/ui.dart';
 import 'add_food.dart';
+import 'coach_screen.dart';
 import 'profile_screen.dart';
 import 'progress_screen.dart';
 import 'today_screen.dart';
@@ -64,7 +65,14 @@ class _HomeShellState extends State<HomeShell> {
 
     return Scaffold(
       extendBody: true,
-      body: SafeArea(bottom: false, child: IndexedStack(index: _tab, children: pages)),
+      body: Stack(children: [
+        SafeArea(bottom: false, child: IndexedStack(index: _tab, children: pages)),
+        Positioned(
+          right: 14,
+          bottom: 112 + MediaQuery.of(context).padding.bottom,
+          child: CoachFab(profile: widget.profile, showTip: _tab == 0),
+        ),
+      ]),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(

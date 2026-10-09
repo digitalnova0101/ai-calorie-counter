@@ -73,6 +73,8 @@ class Profile {
   final double heightCm, weightKg, targetWeightKg;
   final Goals goals;
   final FastState fast;
+  final String targetDate; // yyyy-MM-dd, '' when not set
+  final List<String> allergies, concerns;
 
   const Profile({
     required this.name,
@@ -86,6 +88,9 @@ class Profile {
     required this.goals,
     this.stepGoal = 8000,
     this.fast = const FastState(),
+    this.targetDate = '',
+    this.allergies = const [],
+    this.concerns = const [],
   });
 
   factory Profile.fromMap(Map<String, dynamic> m) => Profile(
@@ -100,6 +105,9 @@ class Profile {
         goals: Goals.fromMap((m['goals'] as Map?)?.cast<String, dynamic>()),
         stepGoal: m['stepGoal'] == null ? 8000 : _i(m['stepGoal']),
         fast: FastState.fromMap((m['fast'] as Map?)?.cast<String, dynamic>()),
+        targetDate: '${m['targetDate'] ?? ''}',
+        allergies: ((m['allergies'] as List?) ?? []).map((e) => '$e').toList(),
+        concerns: ((m['concerns'] as List?) ?? []).map((e) => '$e').toList(),
       );
 
   Map<String, dynamic> toMap() => {
@@ -113,6 +121,9 @@ class Profile {
         'targetWeightKg': targetWeightKg,
         'goals': goals.toMap(),
         'stepGoal': stepGoal,
+        'targetDate': targetDate,
+        'allergies': allergies,
+        'concerns': concerns,
       };
 }
 
