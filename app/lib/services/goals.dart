@@ -138,7 +138,7 @@ Score dayScore(DayLog d, Profile p) {
       t.kcal > 0 ? 35 * math.max(0, 1 - (t.kcal - budget).abs() / budget) : 0.0;
   final proPts = 25 * math.min(1, t.protein / math.max(1, g.protein));
   final watPts = 15 * math.min(1, d.waterMl / math.max(1, g.waterMl));
-  final stepPts = 10 * math.min(1, d.steps / math.max(1, p.stepGoal));
+  final stepPts = 10 * math.min(1, d.steps / math.max(1, stepGoalOf(p)));
   final logPts = 15 * math.min(1, meals / 3);
   final parts = [
     ScorePart('Calories on target', calPts.toDouble(), 35, (c) => c.saffron,
@@ -146,7 +146,7 @@ Score dayScore(DayLog d, Profile p) {
     ScorePart('Protein', proPts.toDouble(), 25, (c) => c.leaf,
         '${t.protein.round()} of ${g.protein} g'),
     ScorePart('Steps', stepPts.toDouble(), 10, (c) => c.water,
-        '${fmtInt(d.steps)} of ${fmtInt(p.stepGoal)}'),
+        '${fmtInt(d.steps)} of ${fmtInt(stepGoalOf(p))}'),
     ScorePart('Water', watPts.toDouble(), 15, (c) => c.water,
         '${(d.waterMl / 1000).toStringAsFixed(1)} of ${(g.waterMl / 1000).toStringAsFixed(1)} L'),
     ScorePart('Meals logged', logPts.toDouble(), 15, (c) => c.wheat,
@@ -164,8 +164,8 @@ Score dayScore(DayLog d, Profile p) {
     tips.add(((c) => c.leaf,
         '${(g.protein - t.protein).round()} g protein to go. Paneer, eggs, dal, curd or chicken help.'));
   }
-  if (d.steps < p.stepGoal) {
-    final left = p.stepGoal - d.steps;
+  if (d.steps < stepGoalOf(p)) {
+    final left = stepGoalOf(p) - d.steps;
     tips.add(((c) => c.water,
         '${fmtInt(left)} more steps to your goal, about a ${math.max(5, (left / 100).round())}-minute walk.'));
   }
@@ -300,3 +300,16 @@ Goals goalsWithPace({
     waterMl: base.waterMl,
   );
 }
+
+
+/// Daily step goal that fits the user's goal and activity (used unless they set their own).
+int recommendedSteps(Profile p) {
+  const base = {'low': 7000, 'light': 8000, 'moderate': 10000, 'high': 12000};
+  var s = base[p.activity] ?? 8000;
+  if (p.goal == 'lose') s += 2000;
+  if (p.goal == 'gain') s -= 1000;
+  return (s.clamp(6000, 15000) / 500).round() * 500;
+}
+
+/// The step goal to use: the user's own number, or the recommended one.
+int stepGoalOf(Profile p) => p.stepGoalCustom ? p.stepGoal : recommendedSteps(p);

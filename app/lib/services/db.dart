@@ -46,7 +46,7 @@ class Db {
       SetOptions(merge: true));
 
   Future<void> setStepGoal(int steps) =>
-      _userDoc.set({'stepGoal': steps}, SetOptions(merge: true));
+      _userDoc.set({'stepGoal': steps, 'stepGoalCustom': true}, SetOptions(merge: true));
 
   Future<void> setFast(FastState f) =>
       _userDoc.set({'fast': f.toMap()}, SetOptions(merge: true));
@@ -87,10 +87,9 @@ class Db {
         d['meals'] = _list(d, 'meals').where((m) => m['id'] != id).toList();
       });
 
-  Future<void> addWater(String date, int ml) => _editDay(date, (d) {
-        final cur = (d['waterMl'] as num?)?.toInt() ?? 0;
-        d['waterMl'] = (cur + ml).clamp(0, 10000);
-      });
+  /// Instant (works offline too): the screen updates at once, the server syncs later.
+  Future<void> addWater(String date, int ml) => _dayDoc(date)
+      .set({'date': date, 'waterMl': FieldValue.increment(ml)}, SetOptions(merge: true));
 
   Future<void> setSteps(String date, int steps) =>
       _editDay(date, (d) => d['steps'] = steps.clamp(0, 100000));

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../services/db.dart';
 import '../services/device.dart';
+import '../services/goals.dart';
 import '../theme.dart';
 import '../widgets/graphics.dart';
 import '../widgets/premium.dart';
@@ -20,7 +21,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _bf = false, _water = false, _w = false, _steps = false;
   String _bfTime = '08:30', _wTime = '07:30';
-  late final _stepGoal = TextEditingController(text: '${widget.profile.stepGoal}');
+  late final _stepGoal = TextEditingController(text: '${stepGoalOf(widget.profile)}');
 
   @override
   void initState() {

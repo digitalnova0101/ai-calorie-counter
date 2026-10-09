@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models.dart';
@@ -224,46 +225,73 @@ class _TodayScreenState extends State<TodayScreen> {
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       const H2('Water'),
-                      Muted(log.waterMl >= g.waterMl
-                          ? '${(log.waterMl / 1000).toStringAsFixed(2)} L, goal done ✓${log.waterMl > g.waterMl ? ' (+${((log.waterMl - g.waterMl) / 1000).toStringAsFixed(2)} L)' : ''}'
-                          : '${(log.waterMl / 1000).toStringAsFixed(2)} of ${(g.waterMl / 1000).toStringAsFixed(1)} L'),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 3,
-                        runSpacing: 3,
-                        // one icon per 250 ml glass; past the goal each extra glass adds an icon
-                        children: List.generate(
-                          math.max((g.waterMl / 250).ceil(), log.waterMl ~/ 250),
-                          (i) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            width: 10,
-                            height: 14,
-                            decoration: BoxDecoration(
-                              color: i < log.waterMl ~/ 250
-                                  ? (i >= (g.waterMl / 250).ceil() ? p.leaf : p.water)
-                                  : p.steel,
-                              borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(2), bottom: Radius.circular(4)),
+                      () {
+                        final goalGl = math.max(1, (g.waterMl / 250).ceil());
+                        final gl = log.waterMl ~/ 250, extra = math.max(0, gl - goalGl);
+                        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text.rich(TextSpan(children: [
+                            TextSpan(
+                                text: '${(log.waterMl / 1000).toStringAsFixed(2)} L',
+                                style: TextStyle(fontWeight: FontWeight.w800, color: p.ink)),
+                            TextSpan(
+                                text: log.waterMl >= g.waterMl ? '  Goal done ✓' : ' of ${(g.waterMl / 1000).toStringAsFixed(2)} L',
+                                style: TextStyle(color: log.waterMl >= g.waterMl ? p.leaf : p.muted, fontWeight: FontWeight.w700)),
+                          ])),
+                          const SizedBox(height: 8),
+                          // one icon per 250 ml glass up to the goal; extra glasses show as "+N"
+                          Row(children: [
+                            Flexible(
+                              child: Wrap(
+                                spacing: 3,
+                                runSpacing: 3,
+                                children: List.generate(
+                                  goalGl,
+                                  (i) => AnimatedContainer(
+                                    duration: const Duration(milliseconds: 250),
+                                    width: 10,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: i < gl ? p.water : p.steel,
+                                      borderRadius: const BorderRadius.vertical(
+                                          top: Radius.circular(2), bottom: Radius.circular(4)),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
+                            if (extra > 0) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                    color: p.leaf.withValues(alpha: .15), borderRadius: BorderRadius.circular(99)),
+                                child: Text('+$extra',
+                                    style: TextStyle(color: p.leaf, fontWeight: FontWeight.w800, fontSize: 12)),
+                              ),
+                            ],
+                          ]),
+                        ]);
+                      }(),
                     ]),
                   ),
                   SquareIconButton(Icons.remove,
                       tooltip: 'Remove a glass',
-                      onTap: log.waterMl <= 0 ? null : () => Db.instance.addWater(_key, -250)),
+                      onTap: log.waterMl <= 0
+                          ? null
+                          : () {
+                              HapticFeedback.selectionClick();
+                              Db.instance.addWater(_key, -250);
+                            }),
                   const SizedBox(width: 8),
                   SquareIconButton(Icons.add,
                       tooltip: 'Add a glass, 250 ml',
                       fill: p.water,
                       iconColor: Colors.white,
-                      onTap: () async {
+                      onTap: () {
+                        HapticFeedback.lightImpact();
                         final before = log.waterMl;
-                        await Db.instance.addWater(_key, 250);
-                        if (context.mounted && before < g.waterMl && before + 250 >= g.waterMl) {
-                          toast(context, 'Water goal done! 💧');
-                        }
+                        Db.instance.addWater(_key, 250); // updates the screen at once
+                        if (before < g.waterMl && before + 250 >= g.waterMl) toast(context, 'Water goal done! 💧');
                       }),
                 ]),
               ),
@@ -488,19 +516,19 @@ class _BurnedCard extends StatelessWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     const Expanded(child: Text('Steps', style: TextStyle(fontWeight: FontWeight.w800))),
-                    Muted('${fmtInt(log.steps)} / ${fmtInt(profile.stepGoal)}'),
+                    Muted('${fmtInt(log.steps)} / ${fmtInt(stepGoalOf(profile))}'),
                   ]),
                   const SizedBox(height: 6),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(9),
                     child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0, end: (log.steps / profile.stepGoal).clamp(0.0, 1.0)),
+                      tween: Tween(begin: 0, end: (log.steps / stepGoalOf(profile)).clamp(0.0, 1.0)),
                       duration: const Duration(milliseconds: 1000),
                       curve: Curves.easeOutCubic,
                       builder: (_, v, __) => LinearProgressIndicator(
                           value: v,
                           minHeight: 7,
-                          color: log.steps >= profile.stepGoal ? p.leaf : p.water,
+                          color: log.steps >= stepGoalOf(profile) ? p.leaf : p.water,
                           backgroundColor: p.steel),
                     ),
                   ),

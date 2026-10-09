@@ -131,6 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       goal: _goal,
       targetWeightKg: _goal == 'maintain' ? weight : _num(_target),
       stepGoal: widget.initial?.stepGoal ?? 8000,
+      stepGoalCustom: widget.initial?.stepGoalCustom ?? false,
       targetDate: _goal == 'maintain' || _date == null ? '' : dayKey(_date!),
       allergies: _allergies.where((x) => x != 'none').toList(),
       concerns: _concerns.where((x) => x != 'none').toList(),

@@ -558,7 +558,7 @@ class WeightPlanCard extends StatelessWidget {
               'About ${fmtInt((stepsExtra / 100).round() * 100)} extra steps, or 🚶 ${minsFor('walk')} min walk · 🚴 ${minsFor('cycle')} min cycling · 🪢 ${minsFor('skip')} min skipping.')
         else
           _dotRow(context, p.water, 'Movement: a bonus',
-              'Your food plan already covers it. Reaching your ${fmtInt(profile.stepGoal)} steps a day (≈ ${fmtInt(stepKcal(profile.stepGoal, m.cur))} kcal) gets you there faster.'),
+              'Your food plan already covers it. Reaching your ${fmtInt(stepGoalOf(profile))} steps a day (≈ ${fmtInt(stepKcal(stepGoalOf(profile), m.cur))} kcal) gets you there faster.'),
         const SizedBox(height: 14),
         todayRow(),
         if (lose && m.needed > 1000) ...[

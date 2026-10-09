@@ -218,7 +218,7 @@ class _StepsSheetState extends State<_StepsSheet> {
     if (!mounted) return;
     Navigator.pop(context);
     messenger.showSnackBar(SnackBar(
-        content: Text(widget.current < widget.profile.stepGoal && _steps >= widget.profile.stepGoal
+        content: Text(widget.current < stepGoalOf(widget.profile) && _steps >= stepGoalOf(widget.profile)
             ? 'Step goal done! 🎉'
             : 'Steps saved')));
   }

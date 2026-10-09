@@ -243,7 +243,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   BarChart(
                     labels: labels,
                     values: week.map((d) => d.steps.toDouble()).toList(),
-                    goal: prof.stepGoal.toDouble(),
+                    goal: stepGoalOf(prof).toDouble(),
                     under: p.water,
                     over: p.leaf,
                     highlight: todayIdx,

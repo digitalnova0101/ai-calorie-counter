@@ -75,6 +75,7 @@ class Profile {
   final FastState fast;
   final String targetDate; // yyyy-MM-dd, '' when not set
   final List<String> allergies, concerns;
+  final bool stepGoalCustom; // true when the user typed their own step goal
 
   const Profile({
     required this.name,
@@ -91,6 +92,7 @@ class Profile {
     this.targetDate = '',
     this.allergies = const [],
     this.concerns = const [],
+    this.stepGoalCustom = false,
   });
 
   factory Profile.fromMap(Map<String, dynamic> m) => Profile(
@@ -108,6 +110,7 @@ class Profile {
         targetDate: '${m['targetDate'] ?? ''}',
         allergies: ((m['allergies'] as List?) ?? []).map((e) => '$e').toList(),
         concerns: ((m['concerns'] as List?) ?? []).map((e) => '$e').toList(),
+        stepGoalCustom: m['stepGoalCustom'] == true,
       );
 
   Map<String, dynamic> toMap() => {
@@ -124,6 +127,7 @@ class Profile {
         'targetDate': targetDate,
         'allergies': allergies,
         'concerns': concerns,
+        'stepGoalCustom': stepGoalCustom,
       };
 }
 
