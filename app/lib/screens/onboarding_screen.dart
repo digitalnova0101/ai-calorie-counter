@@ -315,14 +315,31 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       case 'about':
         return [
           _title("Let's build your plan", 'A few questions so we know how much you need each day.'),
+          const Text('Your name', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+          const SizedBox(height: 8),
           TextField(
             controller: _name,
             textCapitalization: TextCapitalization.words,
-            decoration: const InputDecoration(labelText: 'What should we call you?'),
+            textInputAction: TextInputAction.done,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            decoration: InputDecoration(
+              hintText: 'e.g. Rahul',
+              hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Palette.of(context).muted.withValues(alpha: .6)),
+              prefixIcon: const Padding(
+                padding: EdgeInsets.only(left: 16, right: 10),
+                child: Icon(Icons.person_outline_rounded, size: 26),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Palette.of(context).line, width: 1.5)),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  borderSide: BorderSide(color: Palette.of(context).leaf, width: 2)),
+            ),
           ),
-          const SizedBox(height: 18),
-          const H2('Sex'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
           Row(children: [
             Expanded(child: _choice('👨', 'Male', null, _sex == 'male', () => setState(() => _sex = 'male'))),
             const SizedBox(width: 10),

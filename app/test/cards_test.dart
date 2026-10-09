@@ -10,6 +10,7 @@ import 'package:aicaloriecounter/services/health_data.dart';
 import 'package:aicaloriecounter/services/db.dart';
 import 'package:aicaloriecounter/theme.dart';
 import 'package:aicaloriecounter/widgets/premium.dart';
+import 'package:aicaloriecounter/widgets/graphics.dart';
 
 final problems = <String>[];
 
@@ -115,4 +116,10 @@ void main() {
   testWidgets('tip', (t) async => shot(t, 'tip', TargetTipBox(tip: targetTip('lose', 75, 68, 172))));
   testWidgets('allergies', (t) async => shot(t, 'allergies',
       MultiChoice(choices: allergyChoices, selected: {'milk', 'peanuts'}, onChanged: () {})));
+  testWidgets('bars', (t) async => shot(t, 'bars',
+      BarChart(labels: const ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'], values: const [0, 0, 0, 0, 0, 0, 10791],
+          goal: 8000, under: Colors.blue, over: Colors.green, highlight: 6)));
+  testWidgets('bars2', (t) async => shot(t, 'bars2',
+      BarChart(labels: const ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'], values: const [1526, 1369, 1715, 0, 1547, 1439, 1371],
+          goal: 1530, under: Colors.orange, over: Colors.red, highlight: 6)));
 }

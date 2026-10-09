@@ -401,11 +401,11 @@ class BarChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = Palette.of(context);
     return SizedBox(
-      height: 190,
+      height: 180,
       child: TweenAnimationBuilder<double>(
         tween: Tween(begin: 0, end: 1),
         duration: const Duration(milliseconds: 900),
-        curve: Curves.easeOutBack,
+        curve: Curves.easeOutCubic,
         builder: (_, k, __) => CustomPaint(
           size: Size.infinite,
           painter: _BarPainter(labels, values, goal, under, over, highlight, k, p),
@@ -437,37 +437,64 @@ class _BarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    const top = 24.0, bottom = 26.0;
+    // goal legend at the top left, clear of the bars
+    const legend = 20.0, top = legend + 22, bottom = 26.0;
     final h = size.height - top - bottom;
-    final maxV = math.max(goal, values.fold(0.0, math.max)) * 1.12;
+    final maxVal = values.fold(0.0, math.max);
+    final maxV = math.max(goal, maxVal) * 1.08;
     if (maxV <= 0) return;
     double y(double v) => top + (1 - v / maxV) * h;
-    // goal line
-    final gy = y(goal);
-    final dash = Paint()
-      ..color = p.muted.withValues(alpha: 0.7)
-      ..strokeWidth = 1;
-    for (double x = 0; x < size.width; x += 9) {
-      canvas.drawLine(Offset(x, gy), Offset(math.min(x + 4, size.width), gy), dash);
+    final n = values.length, gap = size.width / n, bw = math.min(28.0, gap * 0.56);
+    // grey tracks behind every bar
+    for (var i = 0; i < n; i++) {
+      final cx = gap * i + gap / 2;
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(Rect.fromLTWH(cx - bw / 2, top, bw, h), const Radius.circular(10)),
+          Paint()..color = p.plateTrack.withValues(alpha: 0.7));
     }
-    _text(canvas, 'Goal ${fmtInt(goal)}', Offset(size.width, gy - 3), 11, p.muted,
-        w: FontWeight.w700, align: TextAlign.right);
-    final n = values.length, gap = size.width / n, bw = math.min(26.0, gap * 0.6);
+    // bars
+    final best = values.isEmpty ? -1 : values.indexOf(maxVal);
     for (var i = 0; i < n; i++) {
       final v = values[i] * k;
       final cx = gap * i + gap / 2;
-      final bh = values[i] > 0 ? math.max(4.0, (top + h) - y(v)) : 0.0;
-      if (bh > 0) {
-        canvas.drawRRect(
-            RRect.fromRectAndRadius(
-                Rect.fromLTWH(cx - bw / 2, top + h - bh, bw, bh), const Radius.circular(8)),
-            Paint()..color = (values[i] > goal ? over : under).withValues(alpha: i == highlight ? 1 : 0.82));
-        if (k > 0.95) {
-          _text(canvas, fmtInt(values[i]), Offset(cx, top + h - bh - 4), 10.5, p.muted,
-              w: FontWeight.w700);
-        }
+      final bh = values[i] > 0 ? math.max(6.0, (top + h) - y(v)) : 0.0;
+      if (bh <= 0) continue;
+      final col = values[i] > goal ? over : under;
+      final r = Rect.fromLTWH(cx - bw / 2, top + h - bh, bw, bh);
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(r, const Radius.circular(10)),
+          Paint()
+            ..shader = LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [col, col.withValues(alpha: i == highlight ? 0.75 : 0.5)])
+                .createShader(r));
+    }
+    // goal line (drawn over the tracks so it is always visible)
+    final gy = y(goal);
+    final dash = Paint()
+      ..color = p.ink.withValues(alpha: 0.45)
+      ..strokeWidth = 1.4;
+    for (double x = 0; x < size.width; x += 8) {
+      canvas.drawLine(Offset(x, gy), Offset(math.min(x + 4, size.width), gy), dash);
+    }
+    // legend: "- - Goal 8,000"
+    for (double x = 0; x < 18; x += 7) {
+      canvas.drawLine(Offset(x, legend / 2), Offset(x + 4, legend / 2), dash);
+    }
+    _text(canvas, 'Goal ${fmtInt(goal)}', Offset(24, legend / 2 + 7), 12, p.muted, w: FontWeight.w800, align: TextAlign.left);
+    // values only for today and the best day, so nothing overlaps
+    if (k > 0.95) {
+      for (final i in {highlight, best}) {
+        if (i < 0 || i >= n || values[i] <= 0) continue;
+        final cx = gap * i + gap / 2;
+        final ty = math.max(top - 4, y(values[i]) - 6);
+        _text(canvas, fmtInt(values[i]), Offset(cx, ty), 11.5, p.ink, w: FontWeight.w800);
       }
-      _text(canvas, labels[i], Offset(cx, size.height - 6), 11.5,
+    }
+    for (var i = 0; i < n; i++) {
+      final cx = gap * i + gap / 2;
+      _text(canvas, i == highlight ? 'Today' : labels[i], Offset(cx, size.height - 6), 12,
           i == highlight ? p.ink : p.muted,
           w: i == highlight ? FontWeight.w800 : FontWeight.w600);
     }

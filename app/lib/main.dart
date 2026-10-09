@@ -36,6 +36,14 @@ class CalorieApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
+      // phones with very large font settings: grow text a little, but keep layouts intact
+      builder: (context, child) {
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(textScaler: mq.textScaler.clamp(minScaleFactor: 0.9, maxScaleFactor: 1.12)),
+          child: child!,
+        );
+      },
       home: const SplashGate(),
     );
   }
