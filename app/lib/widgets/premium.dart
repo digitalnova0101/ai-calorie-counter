@@ -304,6 +304,16 @@ class GoalProgressCard extends StatelessWidget {
     return Pill('Safe ✓', p.leaf, solid: true);
   }
 
+  Widget _paceRow(BuildContext context, String label, String value, Widget tag) => Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Muted(label, size: 12.5),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+          ]),
+        ),
+        tag,
+      ]);
+
   @override
   Widget build(BuildContext context) {
     final p = Palette.of(context);
@@ -360,19 +370,13 @@ class GoalProgressCard extends StatelessWidget {
           ])),
         ]),
         const SizedBox(height: 12),
-        Row(children: [
-          Expanded(child: Muted("Your plan's pace", size: 14)),
-          Text('${m.perWeek.toStringAsFixed(2)} kg / week', style: const TextStyle(fontWeight: FontWeight.w800)),
-          const SizedBox(width: 8),
-          _paceTag(context, m.perWeek, lose),
-        ]),
+        _paceRow(context, "Your plan's pace", '${m.perWeek.toStringAsFixed(2)} kg / week', _paceTag(context, m.perWeek, lose)),
         const SizedBox(height: 10),
-        Row(children: [
-          const Expanded(child: Muted('Your real pace (from weigh-ins)', size: 14)),
-          Text(m.realPace == null ? 'Log a week of weights' : '${m.realPace!.abs().toStringAsFixed(2)} kg / week',
-              style: const TextStyle(fontWeight: FontWeight.w800)),
-          if (m.realPace != null) ...[const SizedBox(width: 8), _paceTag(context, m.realPace, lose)],
-        ]),
+        _paceRow(
+            context,
+            'Your real pace (from weigh-ins)',
+            m.realPace == null ? 'Log a week of weights' : '${m.realPace!.abs().toStringAsFixed(2)} kg / week',
+            _paceTag(context, m.realPace, lose)),
         const SizedBox(height: 14),
         if (lose) ...[
           NoteBox('⚖️', '1 kg of body fat ≈ 7,700 kcal.',
