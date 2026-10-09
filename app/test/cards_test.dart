@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aicaloriecounter/models.dart';
+import 'package:aicaloriecounter/screens/onboarding_extras.dart';
+import 'package:aicaloriecounter/services/health_data.dart';
 import 'package:aicaloriecounter/services/db.dart';
 import 'package:aicaloriecounter/theme.dart';
 import 'package:aicaloriecounter/widgets/premium.dart';
@@ -106,4 +108,11 @@ void main() {
   testWidgets('bmi dark', (t) async => shot(t, 'bmi_dark', const BmiCard(weightKg: 75, heightCm: 172), dark: true));
   testWidgets('history', (t) async => shot(t, 'history',
       Column(children: [for (final d in days().where((d) => d.meals.isNotEmpty)) HistoryRow(day: d, goals: prof().goals)])));
+  testWidgets('plan goal', (t) async => shot(t, 'plan_goal',
+      PlanGoalCard(lose: true, weight: 75, target: 68, heightCm: 172, date: DateTime.now().add(const Duration(days: 100)))));
+  testWidgets('pace', (t) async => shot(t, 'pace',
+      PacePicker(lose: true, weight: 75, target: 68, date: null, onDate: (_) {})));
+  testWidgets('tip', (t) async => shot(t, 'tip', TargetTipBox(tip: targetTip('lose', 75, 68, 172))));
+  testWidgets('allergies', (t) async => shot(t, 'allergies',
+      MultiChoice(choices: allergyChoices, selected: {'milk', 'peanuts'}, onChanged: () {})));
 }

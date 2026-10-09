@@ -4,10 +4,13 @@ import '../models.dart';
 import '../services/db.dart';
 import '../services/goals.dart';
 import '../theme.dart';
+import '../services/health_data.dart';
 import '../widgets/graphics.dart';
+import '../widgets/premium.dart';
+import 'onboarding_extras.dart';
 import '../widgets/ui.dart';
 
-/// 5-step setup. Also used to edit the profile later (pass [initial]).
+/// Setup steps. Also used to edit the profile later (pass [initial]).
 class OnboardingScreen extends StatefulWidget {
   final Profile? initial;
   const OnboardingScreen({super.key, this.initial});
@@ -16,8 +19,23 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const _steps = ['about', 'body', 'activity', 'goal', 'plan'];
+  List<String> get _steps => [
+        'about',
+        'body',
+        'activity',
+        'goal',
+        if (_goal != 'maintain') ...['target', 'date'],
+        'allergies',
+        'health',
+        'plan',
+      ];
   int _step = 0;
+  late double _pace = widget.initial?.goal == 'gain' ? 0.25 : 0.5;
+  late DateTime? _date = widget.initial != null && widget.initial!.targetDate.isNotEmpty
+      ? DateTime.tryParse(widget.initial!.targetDate)
+      : null;
+  late final Set<String> _allergies = {...?widget.initial?.allergies};
+  late final Set<String> _concerns = {...?widget.initial?.concerns};
   String? _error;
   bool _saving = false;
 
@@ -57,9 +75,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       if (h < 120 || h > 230) return 'Enter a height between 120 and 230 cm.';
       if (w < 30 || w > 250) return 'Enter a weight between 30 and 250 kg.';
     }
-    if (s == 'goal' && _goal != 'maintain') {
-      final t = _num(_target);
+    if (s == 'target') {
+      final t = _num(_target), w = _num(_weight);
       if (t < 30 || t > 250) return 'Enter a target weight between 30 and 250 kg.';
+      if (_goal == 'lose' && t >= w) return 'To lose weight, pick a goal below your weight now (${_fmt(w)} kg).';
+      if (_goal == 'gain' && t <= w) return 'To gain weight, pick a goal above your weight now (${_fmt(w)} kg).';
     }
     return null;
   }
@@ -70,14 +90,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       setState(() => _error = err);
       return;
     }
-    if (_steps[_step] == 'goal') {
-      final g = calculateGoals(
+    if (_steps[_step] == 'goal' && _goal != 'maintain' && _num(_target) <= 0) _target.text = _fmt(_num(_weight));
+    if (_steps[_step] == 'target') _date ??= dateForPace(_num(_weight), _num(_target), _pace);
+    if (_step + 1 < _steps.length && _steps[_step + 1] == 'plan') {
+      final g = goalsWithPace(
           sex: _sex,
           age: _num(_age).round(),
           heightCm: _num(_height),
           weightKg: _num(_weight),
           activity: _activity,
-          goal: _goal);
+          goal: _goal,
+          paceKgWeek: _goal == 'maintain' ? 0 : paceOf(_num(_weight), _num(_target), _date));
       _gK.text = '${g.kcal}';
       _gP.text = '${g.protein}';
       _gC.text = '${g.carbs}';
@@ -108,6 +131,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       goal: _goal,
       targetWeightKg: _goal == 'maintain' ? weight : _num(_target),
       stepGoal: widget.initial?.stepGoal ?? 8000,
+      targetDate: _goal == 'maintain' || _date == null ? '' : dayKey(_date!),
+      allergies: _allergies.where((x) => x != 'none').toList(),
+      concerns: _concerns.where((x) => x != 'none').toList(),
       goals: Goals(
         kcal: v(_gK, 800, 6000, 2000),
         protein: v(_gP, 0, 400, 100),
@@ -329,8 +355,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ];
         return [
           _title("What's your goal?"),
-          ...goals.map((g) => _choice(g[1], g[2], g[3], _goal == g[0], () => setState(() => _goal = g[0]))),
-          if (_goal != 'maintain') ...[const SizedBox(height: 6), _dial('Target weight', _target, 'kg', 0.5)],
+          ...goals.map((g) => _choice(g[1], g[2], g[3], _goal == g[0], () => setState(() {
+                _goal = g[0];
+                _pace = g[0] == 'gain' ? 0.25 : 0.5;
+                _date = null;
+                final w = _num(_weight);
+                if (g[0] == 'lose' && _num(_target) >= w) _target.text = _fmt((w * 0.9 * 2).roundToDouble() / 2);
+                if (g[0] == 'gain' && _num(_target) <= w) _target.text = _fmt(((w + 4) * 2).roundToDouble() / 2);
+              }))),
+        ];
+      case 'target':
+        final tip = targetTip(_goal, _num(_weight), _num(_target), _num(_height));
+        return [
+          _title("What's your goal weight?", 'You are ${_fmt(_num(_weight))} kg now.'),
+          _dial('Goal weight', _target, 'kg', 0.5),
+          TargetTipBox(tip: tip),
+        ];
+      case 'date':
+        return [
+          _title('How fast do you want to go?', 'Pick a pace. We work out the date for you.'),
+          PacePicker(
+            lose: _goal == 'lose',
+            weight: _num(_weight),
+            target: _num(_target),
+            date: _date,
+            onDate: (d) => setState(() => _date = d),
+          ),
+        ];
+      case 'allergies':
+        return [
+          _title('Any food allergies?', "We'll warn you when a scanned food may have them."),
+          MultiChoice(
+            choices: allergyChoices,
+            selected: _allergies,
+            onChanged: () => setState(() {}),
+          ),
+        ];
+      case 'health':
+        return [
+          _title('Any health goals?', 'We tune your plan and the AI coach around these.'),
+          MultiChoice(
+            choices: concernChoices,
+            selected: _concerns,
+            onChanged: () => setState(() {}),
+          ),
+          const SizedBox(height: 8),
+          const Muted('General guidance, not medical advice. If you have a condition, follow your doctor.', size: 12),
         ];
       default:
         final p = Palette.of(context);
@@ -372,14 +442,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             );
         return [
-          _title('Your daily plan', 'Tap any number to change it.'),
-          Panel(child: BmiGauge(weightKg: _num(_weight), heightCm: _num(_height))),
+          _title('Your custom plan is ready!', 'Tap any number to change it.'),
+          if (_goal != 'maintain') ...[
+            PlanGoalCard(
+                lose: _goal == 'lose',
+                weight: _num(_weight),
+                target: _num(_target),
+                heightCm: _num(_height),
+                date: _date ?? dateForPace(_num(_weight), _num(_target), _goal == 'gain' ? 0.25 : 0.5)),
+            const SizedBox(height: 12),
+          ],
+          Panel(child: BmiCard(weightKg: _num(_weight), heightCm: _num(_height))),
           const SizedBox(height: 12),
           tgt('Calories', _gK, p.saffron,
               sub: _goal == 'lose'
-                  ? '500 below your daily burn'
+                  ? 'Below your daily burn, to reach your goal on time'
                   : _goal == 'gain'
-                      ? '300 above your daily burn'
+                      ? 'Above your daily burn, for a lean gain'
                       : 'Matches your daily burn'),
           const SizedBox(height: 10),
           Row(children: [

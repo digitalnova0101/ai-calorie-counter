@@ -32,10 +32,13 @@ class Db {
       _userDoc.collection('days').doc(date);
 
   // ---------- profile ----------
+  /// Latest profile seen (used by screens that need allergies etc.).
+  Profile? current;
+
   Stream<Profile?> profileStream() => _userDoc.snapshots().map((s) {
         final d = s.data();
         if (d == null || d['goals'] == null) return null;
-        return Profile.fromMap(d);
+        return current = Profile.fromMap(d);
       });
 
   Future<void> saveProfile(Profile p) => _userDoc.set(

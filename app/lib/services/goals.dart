@@ -271,3 +271,32 @@ class GoalMath {
         needed * 7 / kcalPerKg, tdee, fromFood, fromMove, real);
   }
 }
+
+/// Daily targets when the user picked a pace (kg per week) for their goal.
+Goals goalsWithPace({
+  required String sex,
+  required int age,
+  required double heightCm,
+  required double weightKg,
+  required String activity,
+  required String goal,
+  required double paceKgWeek,
+}) {
+  final base = calculateGoals(
+      sex: sex, age: age, heightCm: heightCm, weightKg: weightKg, activity: activity, goal: goal);
+  if (goal == 'maintain') return base;
+  final bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + (sex == 'female' ? -161 : 5);
+  final tdee = bmr * (_actF[activity] ?? 1.375);
+  final perDay = paceKgWeek * kcalPerKg / 7;
+  double kcal = goal == 'lose' ? tdee - math.min(perDay, 1000) : tdee + math.min(perDay, 550);
+  kcal = math.max(kcal, sex == 'female' ? 1200.0 : 1500.0);
+  final fat = kcal * 0.28 / 9;
+  final carbs = math.max(50.0, (kcal - base.protein * 4 - fat * 9) / 4);
+  return Goals(
+    kcal: (kcal / 10).round() * 10,
+    protein: base.protein,
+    carbs: carbs.round(),
+    fat: fat.round(),
+    waterMl: base.waterMl,
+  );
+}

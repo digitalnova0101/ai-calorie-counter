@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../services/ai.dart';
 import '../services/db.dart';
+import '../services/health_data.dart';
 import '../theme.dart';
 import '../widgets/graphics.dart';
 import '../widgets/ui.dart';
@@ -314,6 +315,15 @@ class _ResultScreenState extends State<ResultScreen> {
                     Text('Verified', style: TextStyle(color: p.leaf, fontWeight: FontWeight.w800, fontSize: 11.5)),
                   ]),
               ]),
+              for (final al in allergensIn(it.name, Db.instance.current?.allergies ?? const []))
+                Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                      color: p.chili.withValues(alpha: .12), borderRadius: BorderRadius.circular(99)),
+                  child: Text('⚠ May contain ${al.toLowerCase()}',
+                      style: TextStyle(color: p.chili, fontWeight: FontWeight.w800, fontSize: 11.5)),
+                ),
               const SizedBox(height: 4),
               Pressable(
                 onTap: () => _pickPortion(it),
