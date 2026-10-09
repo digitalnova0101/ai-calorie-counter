@@ -143,6 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (email.isNotEmpty) Muted(email, size: 12),
             ]),
           ),
+          const _AccountButton(),
         ]),
       ),
       const SizedBox(height: 12),
@@ -227,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ]),
       ),
       const SizedBox(height: 12),
-      _AccountPanel(),
+      const _DeleteDataButton(),
       const SizedBox(height: 16),
       const Muted('Nutrition numbers are estimates, not medical advice. Talk to a doctor or dietitian before big diet changes.',
           size: 12, align: TextAlign.center),
@@ -236,8 +237,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 
-/// Account: save guest data with an email, log in / out, delete everything.
-class _AccountPanel extends StatelessWidget {
+/// Small login / sign up (or log out) button for the top card.
+class _AccountButton extends StatelessWidget {
+  const _AccountButton();
+
+  void _open(BuildContext context, bool saveGuest) => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (_) => AuthScreen(popOnDone: true, saveGuest: saveGuest)));
+
+  @override
+  Widget build(BuildContext context) => StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.userChanges(),
+        builder: (context, _) {
+          final u = FirebaseAuth.instance.currentUser;
+          final guest = u == null || u.isAnonymous;
+          if (!guest) {
+            return OutlinedButton.icon(
+              onPressed: () => FirebaseAuth.instance.signOut(),
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 38), padding: const EdgeInsets.symmetric(horizontal: 12)),
+              icon: const Icon(Icons.logout, size: 18),
+              label: const Text('Log out'),
+            );
+          }
+          return FilledButton.icon(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 38), padding: const EdgeInsets.symmetric(horizontal: 14)),
+            icon: const Icon(Icons.login, size: 18),
+            label: const Text('Log in'),
+            onPressed: () => showAppSheet<void>(
+              context,
+              (ctx) => Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const H2('Your account'),
+                  const SizedBox(height: 4),
+                  const Muted("You're using the app as a guest. Save your data with an email so you don't lose it if you change phone."),
+                  const SizedBox(height: 14),
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _open(context, true);
+                    },
+                    icon: const Icon(Icons.cloud_done_outlined),
+                    label: const Text('Sign up · keep my data'),
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _open(context, false);
+                    },
+                    child: const Text('I already have an account · Log in'),
+                  ),
+                  const SizedBox(height: 4),
+                  Muted('Logging in to another account shows that account\'s data instead.', size: 12, align: TextAlign.center),
+                ]),
+              ),
+            ),
+          );
+        },
+      );
+}
+
+/// "Delete all my data" (Play Store requirement).
+class _DeleteDataButton extends StatelessWidget {
+  const _DeleteDataButton();
   Future<void> _delete(BuildContext context) async {
     final p = Palette.of(context);
     final ok = await showDialog<bool>(
@@ -273,50 +335,13 @@ class _AccountPanel extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.userChanges(),
-        builder: (context, _) => _panel(context),
-      );
-
-  Widget _panel(BuildContext context) {
+  Widget build(BuildContext context) {
     final p = Palette.of(context);
-    final u = FirebaseAuth.instance.currentUser;
-    final guest = u == null || u.isAnonymous;
-    return Panel(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const H2('Account'),
-        const SizedBox(height: 6),
-        Muted(guest
-            ? "You're using the app as a guest. Save your data with an email so you don't lose it if you change phone."
-            : 'Logged in as ${u?.email ?? ''}'),
-        const SizedBox(height: 12),
-        if (guest) ...[
-          FilledButton.icon(
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true, saveGuest: true))),
-            icon: const Icon(Icons.cloud_done_outlined),
-            label: const Text('Save my data with email'),
-          ),
-          const SizedBox(height: 8),
-          OutlinedButton(
-            onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true))),
-            child: const Text('Log in to my account'),
-          ),
-        ] else
-          OutlinedButton.icon(
-            onPressed: () => FirebaseAuth.instance.signOut(),
-            icon: const Icon(Icons.logout),
-            label: const Text('Log out'),
-          ),
-        const SizedBox(height: 8),
-        TextButton.icon(
-          onPressed: () => _delete(context),
-          style: TextButton.styleFrom(foregroundColor: p.danger),
-          icon: const Icon(Icons.delete_outline),
-          label: const Text('Delete all my data'),
-        ),
-      ]),
+    return TextButton.icon(
+      onPressed: () => _delete(context),
+      style: TextButton.styleFrom(foregroundColor: p.danger),
+      icon: const Icon(Icons.delete_outline),
+      label: const Text('Delete all my data'),
     );
   }
 }

@@ -444,12 +444,12 @@ class _BarPainter extends CustomPainter {
     final maxV = math.max(goal, maxVal) * 1.08;
     if (maxV <= 0) return;
     double y(double v) => top + (1 - v / maxV) * h;
-    final n = values.length, gap = size.width / n, bw = math.min(28.0, gap * 0.56);
+    final n = values.length, gap = size.width / n, bw = math.min(28.0, gap * (n > 10 ? 0.62 : 0.56));
     // grey tracks behind every bar
     for (var i = 0; i < n; i++) {
       final cx = gap * i + gap / 2;
       canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(cx - bw / 2, top, bw, h), const Radius.circular(10)),
+          RRect.fromRectAndRadius(Rect.fromLTWH(cx - bw / 2, top, bw, h), Radius.circular(math.min(10, bw / 2))),
           Paint()..color = p.plateTrack.withValues(alpha: 0.7));
     }
     // bars
@@ -462,7 +462,7 @@ class _BarPainter extends CustomPainter {
       final col = values[i] > goal ? over : under;
       final r = Rect.fromLTWH(cx - bw / 2, top + h - bh, bw, bh);
       canvas.drawRRect(
-          RRect.fromRectAndRadius(r, const Radius.circular(10)),
+          RRect.fromRectAndRadius(r, Radius.circular(math.min(10, bw / 2))),
           Paint()
             ..shader = LinearGradient(
                     begin: Alignment.topCenter,
@@ -485,7 +485,7 @@ class _BarPainter extends CustomPainter {
     _text(canvas, 'Goal ${fmtInt(goal)}', Offset(24, legend / 2 + 7), 12, p.muted, w: FontWeight.w800, align: TextAlign.left);
     // values only for today and the best day, so nothing overlaps
     if (k > 0.95) {
-      for (final i in {highlight, best}) {
+      for (final i in (n > 10 ? {best} : {highlight, best})) {
         if (i < 0 || i >= n || values[i] <= 0) continue;
         final cx = gap * i + gap / 2;
         final ty = math.max(top - 4, y(values[i]) - 6);
@@ -494,7 +494,9 @@ class _BarPainter extends CustomPainter {
     }
     for (var i = 0; i < n; i++) {
       final cx = gap * i + gap / 2;
-      _text(canvas, i == highlight ? 'Today' : labels[i], Offset(cx, size.height - 6), 12,
+      final lbl = i == highlight ? (n > 10 ? 'Today' : 'Today') : labels[i];
+      if (lbl.isEmpty) continue;
+      _text(canvas, lbl, Offset(n > 10 && i == highlight ? cx - 6 : cx, size.height - 6), n > 10 ? 11 : 12,
           i == highlight ? p.ink : p.muted,
           w: i == highlight ? FontWeight.w800 : FontWeight.w600);
     }

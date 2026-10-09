@@ -26,6 +26,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
   List<DayLog>? _days;
   int _range = 30;
   bool _histAll = false;
+  int _stepDays = 30;
 
   static const _wd = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
@@ -131,8 +132,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
             }
           }
           final onT = logged.where((d) => (d.totals.kcal - g.kcal).abs() <= g.kcal * .1).length;
-          final steps = week.map((d) => d.steps).toList();
+          // steps: last 30 (or 7) days, oldest first
+          const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          final sDays = days == null ? <DayLog>[] : days.take(_stepDays).toList().reversed.toList();
+          final steps = sDays.map((d) => d.steps).toList();
+          final sLabels = [
+            for (var i = 0; i < sDays.length; i++)
+              _stepDays <= 7
+                  ? _wd[parseDay(sDays[i].date).weekday - 1]
+                  : ((sDays.length - 1 - i) % 5 == 0 ? '${parseDay(sDays[i].date).day}' : '')
+          ];
           final bestI = steps.isEmpty ? -1 : steps.indexOf(steps.reduce(math.max));
+          String dayName(int i) {
+            final d = parseDay(sDays[i].date);
+            return _stepDays <= 7 ? _wd[d.weekday - 1] : '${d.day} ${mo[d.month - 1]}';
+          }
           double avg(Iterable<double> v) {
             final l = v.where((x) => x > 0).toList();
             return l.isEmpty ? 0.0 : l.reduce((a, b) => a + b) / l.length;
@@ -234,26 +248,31 @@ class _ProgressScreenState extends State<ProgressScreen> {
               // steps
               Panel(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  SectionHead('👟', 'Steps', p.water,
-                      sub: 'Last 7 days',
-                      trailing: bestI < 0 || steps[bestI] == 0
-                          ? null
-                          : Pill('🏅 Best: ${labels[bestI]} ${fmtInt(steps[bestI])}', p.leaf)),
+                  SectionHead('👟', 'Steps', p.water, sub: 'Last $_stepDays days'),
                   const SizedBox(height: 12),
                   Row(children: [
-                    Expanded(child: _stat(context, 'Avg steps', fmtInt(avg(week.map((d) => d.steps.toDouble()))))),
-                    Expanded(
-                        child: _stat(context, 'Avg burned',
-                            '${avg(week.map((d) => burnedOf(d, prof).total)).round()} kcal')),
+                    _DayTabs(value: _stepDays, onChanged: (v) => setState(() => _stepDays = v)),
+                    const Spacer(),
+                    if (bestI >= 0 && steps[bestI] > 0) Pill('🏅 Best: ${dayName(bestI)} · ${fmtInt(steps[bestI])}', p.leaf),
                   ]),
                   const SizedBox(height: 12),
+                  Row(children: [
+                    Expanded(child: _stat(context, 'Avg steps', fmtInt(avg(sDays.map((d) => d.steps.toDouble()))))),
+                    Expanded(
+                        child: _stat(context, 'Avg burned',
+                            '${avg(sDays.map((d) => burnedOf(d, prof).total)).round()} kcal')),
+                  ]),
+                  const SizedBox(height: 4),
+                  Muted('Days at goal: ${sDays.where((d) => d.steps >= stepGoalOf(prof)).length} of ${sDays.length}', size: 12.5),
+                  const SizedBox(height: 12),
                   BarChart(
-                    labels: labels,
-                    values: week.map((d) => d.steps.toDouble()).toList(),
+                    key: ValueKey('steps$_stepDays'),
+                    labels: sLabels,
+                    values: steps.map((v) => v.toDouble()).toList(),
                     goal: stepGoalOf(prof).toDouble(),
                     under: p.water,
                     over: p.leaf,
-                    highlight: todayIdx,
+                    highlight: sDays.length - 1,
                   ),
                 ]),
               ),
@@ -284,4 +303,34 @@ class _ProgressScreenState extends State<ProgressScreen> {
         Muted(label, size: 12),
         Text(value, style: display(context, 20)),
       ]);
+}
+
+
+/// 7D / 30D switch for the steps chart.
+class _DayTabs extends StatelessWidget {
+  final int value;
+  final ValueChanged<int> onChanged;
+  const _DayTabs({required this.value, required this.onChanged});
+  @override
+  Widget build(BuildContext context) {
+    final p = Palette.of(context);
+    Widget b(String t, int v) => GestureDetector(
+          onTap: () => onChanged(v),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            decoration: BoxDecoration(
+              color: value == v ? p.surface : Colors.transparent,
+              borderRadius: BorderRadius.circular(9),
+              boxShadow: value == v ? [BoxShadow(color: Colors.black.withValues(alpha: .08), blurRadius: 6)] : null,
+            ),
+            child: Text(t, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: value == v ? p.ink : p.muted)),
+          ),
+        );
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: p.bg, borderRadius: BorderRadius.circular(12)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [b('7D', 7), b('30D', 30)]),
+    );
+  }
 }
