@@ -67,6 +67,20 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  Future<void> _skip() async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = _message(e));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _forgot() async {
     final email = _email.text.trim();
     if (email.isEmpty) {
@@ -146,6 +160,20 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   if (!_signUp)
                     TextButton(onPressed: _busy ? null : _forgot, child: const Text('Forgot password')),
+                  const SizedBox(height: 16),
+                  Row(children: [
+                    Expanded(child: Divider(color: p.line)),
+                    const Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Muted('or', size: 13)),
+                    Expanded(child: Divider(color: p.line)),
+                  ]),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: _busy ? null : _skip,
+                    style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                    child: const Text('Skip for now'),
+                  ),
+                  const SizedBox(height: 6),
+                  const Muted('You can add an email later in Profile to keep your data safe.', size: 12, align: TextAlign.center),
                 ],
               ),
             ),
