@@ -1,33 +1,7 @@
-
-The test description was:
-  bmi dark
-════════════════════════════════════════════════════════════════════════════════════════════════════
-Error: google_fonts was unable to load font Unbounded-SemiBold because the following exception occurred:
-Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-SemiBold was not found in the application assets. Ensure Unbounded-SemiBold.ttf exists in a folder that is included in your pubspec's assets.
-
-There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
-If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
-
-══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
-The following _Exception was thrown running a test (but after the test had completed):
-Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-SemiBold was not
-found in the application assets. Ensure Unbounded-SemiBold.ttf exists in a folder that is included
-in your pubspec's assets.
-
-When the exception was thrown, this was the stack:
-#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
-<asynchronous suspension>
-#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
-<asynchronous suspension>
-════════════════════════════════════════════════════════════════════════════════════════════════════
-Test failed. See exception logs above.
-The test description was: bmi dark
-
-Test failed. See exception logs above.
-The test description was: bmi dark
+The test description was: pace
 
 ::endgroup::
-::group::❌ history (failed)
+::group::❌ tip (failed)
 Error: google_fonts was unable to load font Manrope-Regular because the following exception occurred:
 Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your pubspec's assets.
 
@@ -47,14 +21,40 @@ When the exception was thrown, this was the stack:
 <asynchronous suspension>
 
 The test description was:
-  history
+  tip
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 Test failed. See exception logs above.
-The test description was: history
+The test description was: tip
+
+::endgroup::
+::group::❌ allergies (failed)
+Error: google_fonts was unable to load font Manrope-Regular because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found
+in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+
+The test description was:
+  allergies
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Test failed. See exception logs above.
+The test description was: allergies
 
 ::endgroup::
 ::group::✅ (tearDownAll)
 LAYOUT PROBLEMS: 0
 ::endgroup::
 
-::error::0 tests passed, 8 failed.
+::error::0 tests passed, 12 failed.
