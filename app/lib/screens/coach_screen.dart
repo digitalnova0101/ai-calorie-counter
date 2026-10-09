@@ -515,3 +515,34 @@ class _CoachFabState extends State<CoachFab> with SingleTickerProviderStateMixin
     ]);
   }
 }
+
+/// Compact "✨ AI coach" button for the top right of a screen.
+class CoachTopButton extends StatelessWidget {
+  final Profile profile;
+  const CoachTopButton({super.key, required this.profile});
+  @override
+  Widget build(BuildContext context) {
+    final p = Palette.of(context);
+    return Semantics(
+      button: true,
+      label: 'Ask your AI coach',
+      child: Pressable(
+        onTap: () => openCoach(context, profile),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(4, 4, 12, 4),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(99),
+            border: Border.all(color: p.leaf.withValues(alpha: .45), width: 1.5),
+            boxShadow: [BoxShadow(color: p.leaf.withValues(alpha: .18), blurRadius: 12, offset: const Offset(0, 4))],
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const CoachLogo(size: 30),
+            const SizedBox(width: 8),
+            Text('AI coach', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: p.ink)),
+          ]),
+        ),
+      ),
+    );
+  }
+}

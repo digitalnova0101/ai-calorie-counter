@@ -14,6 +14,7 @@ import '../widgets/swipe_tile.dart';
 import '../widgets/ui.dart';
 import 'activity_sheets.dart';
 import 'add_food.dart';
+import 'coach_screen.dart';
 import 'fasting_screen.dart';
 import 'report_screen.dart';
 import 'result_screen.dart';
@@ -131,9 +132,11 @@ class _TodayScreenState extends State<TodayScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     decoration: BoxDecoration(
                         color: p.saffron.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(99)),
-                    child: Text('🔥 $_streak ${_streak == 1 ? 'day' : 'days'}',
+                    child: Text('🔥 $_streak',
                         style: const TextStyle(fontWeight: FontWeight.w800)),
                   ),
+                const SizedBox(width: 8),
+                CoachTopButton(profile: prof),
               ]),
               const SizedBox(height: 10),
               Row(children: [

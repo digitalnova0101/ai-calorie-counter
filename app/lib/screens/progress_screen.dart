@@ -9,6 +9,7 @@ import '../theme.dart';
 import '../widgets/graphics.dart';
 import '../widgets/ui.dart';
 import '../widgets/premium.dart';
+import 'coach_screen.dart';
 import 'onboarding_screen.dart';
 import 'report_screen.dart';
 
@@ -132,7 +133,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
           final hist = days == null ? <DayLog>[] : days.where((d) => d.meals.isNotEmpty).toList();
           return ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 130), children: [
-            Text('Progress', style: display(context, 22, weight: FontWeight.w700)),
+            Row(children: [
+              Expanded(child: Text('Progress', style: display(context, 22, weight: FontWeight.w700))),
+              CoachTopButton(profile: prof),
+            ]),
             const SizedBox(height: 12),
             if (prof.goal != 'maintain' && prof.targetWeightKg > 0) ...[
               GoalProgressCard(profile: prof, weights: all, onFixGoal: fixGoal),
