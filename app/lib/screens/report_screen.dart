@@ -204,7 +204,7 @@ class _ReportScreenState extends State<ReportScreen> {
     void text(String t, Offset at, TextStyle st, {TextAlign align = TextAlign.left, double maxW = 900}) {
       final tp = TextPainter(text: TextSpan(text: t, style: st), textDirection: TextDirection.ltr, textAlign: align)
         ..layout(maxWidth: maxW);
-      final dx = align == TextAlign.center ? tp.width / 2 : (align == TextAlign.right ? tp.width : 0);
+      final dx = align == TextAlign.center ? tp.width / 2 : (align == TextAlign.right ? tp.width : 0.0);
       tp.paint(c, at - Offset(dx, tp.height / 2));
     }
 

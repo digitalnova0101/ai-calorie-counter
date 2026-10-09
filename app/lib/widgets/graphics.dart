@@ -431,7 +431,7 @@ class _BarPainter extends CustomPainter {
         text: TextSpan(text: t, style: TextStyle(fontSize: size, color: col, fontWeight: w)),
         textDirection: TextDirection.ltr)
       ..layout();
-    final dx = align == TextAlign.center ? tp.width / 2 : (align == TextAlign.right ? tp.width : 0);
+    final dx = align == TextAlign.center ? tp.width / 2 : (align == TextAlign.right ? tp.width : 0.0);
     tp.paint(c, at - Offset(dx, tp.height));
   }
 

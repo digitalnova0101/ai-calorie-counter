@@ -16,7 +16,7 @@ dependencies:
   mobile_scanner: any
   http: any
   intl: any
-  google_fonts: any
+  google_fonts: ^6.2.1
   image: any
   shared_preferences: any
   flutter_local_notifications: ^19.4.0
