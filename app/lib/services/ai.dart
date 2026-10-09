@@ -22,7 +22,8 @@ class AiException implements Exception {
 }
 
 /// Calls our AI server (api/analyze on Vercel; Gemini runs there, the key never reaches the app).
-/// The server address comes from config/api_url.txt at build time.
+/// The server address comes from config/api_url.txt at build time: either the full
+/// address (https://yourdomain.com/api/analyze.php) or a Vercel site (https://x.vercel.app).
 const String kApiUrl = String.fromEnvironment('API_URL');
 
 /// The AI names each food; when it's in our Indian food list the numbers come
@@ -43,7 +44,7 @@ class AiService {
     try {
       final token = await FirebaseAuth.instance.currentUser?.getIdToken();
       final res = await http
-          .post(Uri.parse('$kApiUrl/api/analyze'),
+          .post(Uri.parse(kApiUrl.contains('/api/') ? kApiUrl : '$kApiUrl/api/analyze'),
               headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ${token ?? ''}'},
               body: jsonEncode({...data, 'dbNames': names}))
           .timeout(const Duration(seconds: 60));
