@@ -1,0 +1,6 @@
+app
+tools
+android_patch
+config
+*.md
+firestore.rules

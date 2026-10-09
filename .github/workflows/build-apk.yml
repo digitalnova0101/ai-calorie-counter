@@ -1,0 +1,74 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Build the APK
+        id: build
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p ~/.android && cp tools/debug.keystore ~/.android/debug.keystore
+          cd app
+          {
+            flutter --version
+            flutter create --org com.digitalnova --project-name aicaloriecounter --platforms android .
+            rm -f test/widget_test.dart
+            python3 ../tools/patch_android.py
+            python3 ../tools/make_firebase_options.py ../google-services.json lib/firebase_options.dart com.digitalnova.aicaloriecounter
+            flutter pub get
+            flutter build apk --release --dart-define=API_URL="$(cat ../config/api_url.txt 2>/dev/null | tr -d '[:space:]')"
+          } 2>&1 | tee ../build-log.txt
+
+      - name: Publish the APK
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp app/build/app/outputs/flutter-apk/app-release.apk AI-Calorie-Counter.apk
+          TAG="v1.0.${{ github.run_number }}"
+          gh release create "$TAG" AI-Calorie-Counter.apk \
+            --title "AI Calorie Counter $TAG" \
+            --notes "Download **AI-Calorie-Counter.apk** below, open it on your Android phone and tap Install." \
+            --latest
+
+      - name: Save build log for checking
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "build-bot"
+          git config user.email "build-bot@users.noreply.github.com"
+          STATUS="${{ steps.build.outcome }}"
+          git fetch origin ci-logs 2>/dev/null && git checkout -B ci-logs origin/ci-logs || git checkout --orphan ci-logs
+          git rm -rfq --cached . >/dev/null 2>&1 || true
+          echo "run ${{ github.run_number }} commit ${{ github.sha }} status $STATUS" > status.txt
+          tail -c 200000 build-log.txt > last-build-log.txt 2>/dev/null || echo "no log" > last-build-log.txt
+          git add -f status.txt last-build-log.txt
+          git commit -qm "build ${{ github.run_number }}: $STATUS" && git push -f origin ci-logs

@@ -1,0 +1,34 @@
+name: aicaloriecounter
+description: AI Calorie Counter - scan Indian food photos to count calories, protein, carbs and fat.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: any
+  firebase_auth: any
+  cloud_firestore: any
+  image_picker: any
+  mobile_scanner: any
+  http: any
+  intl: any
+  google_fonts: any
+  image: any
+  shared_preferences: any
+  flutter_local_notifications: ^19.4.0
+  timezone: ^0.10.1
+  health: ^13.1.0
+  share_plus: ^11.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/foods_in.json
