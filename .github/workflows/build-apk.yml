@@ -59,6 +59,15 @@ jobs:
           UPLOAD_KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
           UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
 
+      - name: Layout check (pictures of the new cards)
+        if: success()
+        continue-on-error: true
+        shell: bash
+        run: |
+          cd app
+          flutter test test/cards_test.dart --update-goldens 2>&1 | tail -60 > ../layout-log.txt || true
+          mkdir -p ../layout && cp test/goldens/*.png ../layout/ 2>/dev/null || true
+
       - name: Publish the APK
         if: success()
         shell: bash
@@ -87,5 +96,7 @@ jobs:
           git rm -rfq --cached . >/dev/null 2>&1 || true
           echo "run ${{ github.run_number }} commit ${{ github.sha }} status $STATUS" > status.txt
           tail -c 200000 build-log.txt > last-build-log.txt 2>/dev/null || echo "no log" > last-build-log.txt
-          git add -f status.txt last-build-log.txt
+          rm -rf layout-shots && mkdir -p layout-shots && cp layout/*.png layout-shots/ 2>/dev/null || true
+          cp layout-log.txt layout-shots/ 2>/dev/null || true
+          git add -f status.txt last-build-log.txt layout-shots
           git commit -qm "build ${{ github.run_number }}: $STATUS" && git push -f origin ci-logs
