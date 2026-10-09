@@ -27,8 +27,8 @@ if "signingConfigs {" not in s:
         create("release") {
             val kp = rootProject.file("key.properties")
             if (kp.exists()) {
-                val props = java.util.Properties()
-                kp.inputStream().use { props.load(it) }
+                val props = Properties()
+                props.load(FileInputStream(kp))
                 keyAlias = props.getProperty("keyAlias")
                 keyPassword = props.getProperty("keyPassword")
                 storeFile = file(props.getProperty("storeFile"))
@@ -40,6 +40,8 @@ if "signingConfigs {" not in s:
     buildTypes {""", 1)
 s = s.replace('signingConfig = signingConfigs.getByName("debug")',
     'signingConfig = if (rootProject.file("key.properties").exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")', 1)
+if not s.startswith("import java.util.Properties"):
+    s = "import java.util.Properties\nimport java.io.FileInputStream\n\n" + s
 open(g, "w").write(s)
 print(s)
 
