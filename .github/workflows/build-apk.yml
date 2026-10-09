@@ -52,7 +52,7 @@ jobs:
             fi
             API="$(cat ../config/api_url.txt 2>/dev/null | tr -d '[:space:]')"
             V="--build-name=1.0.${{ github.run_number }} --build-number=${{ github.run_number }}"
-            flutter build apk --release $V --dart-define=API_URL="$API"
+            flutter build apk --release --split-per-abi $V --dart-define=API_URL="$API"
             if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then flutter build appbundle --release $V --dart-define=API_URL="$API"; fi
           } 2>&1 | tee ../build-log.txt
         env:
@@ -65,13 +65,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/app/outputs/flutter-apk/app-release.apk AI-Calorie-Counter.apk
-          FILES="AI-Calorie-Counter.apk"
+          O=app/build/app/outputs/flutter-apk
+          cp $O/app-arm64-v8a-release.apk AI-Calorie-Counter.apk
+          cp $O/app-armeabi-v7a-release.apk AI-Calorie-Counter-old-phones.apk
+          FILES="AI-Calorie-Counter.apk AI-Calorie-Counter-old-phones.apk"
           if [ -f app/build/app/outputs/bundle/release/app-release.aab ]; then cp app/build/app/outputs/bundle/release/app-release.aab AI-Calorie-Counter-PlayStore.aab; FILES="$FILES AI-Calorie-Counter-PlayStore.aab"; fi
           TAG="v1.0.${{ github.run_number }}"
           gh release create "$TAG" $FILES \
             --title "AI Calorie Counter $TAG" \
-            --notes "Phone: download **AI-Calorie-Counter.apk** and tap Install. Play Store: upload **AI-Calorie-Counter-PlayStore.aab** (only present once the upload key is set)." \
+            --notes "Phone: download **AI-Calorie-Counter.apk** and tap Install (if it says the app is not compatible, use AI-Calorie-Counter-old-phones.apk). Play Store: upload **AI-Calorie-Counter-PlayStore.aab** (only present once the upload key is set)." \
             --latest
 
       - name: Save build log for checking
