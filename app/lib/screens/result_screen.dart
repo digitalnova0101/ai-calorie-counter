@@ -279,7 +279,7 @@ class _ResultScreenState extends State<ResultScreen> {
         title: Text(_dish.isNotEmpty ? _dish : (_loading ? 'Scanning' : 'Your meal')),
       ),
       body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+        padding: EdgeInsets.fromLTRB(16, 4, 16, bottomGap(context)),
         itemCount: children.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (_, i) => children[i],

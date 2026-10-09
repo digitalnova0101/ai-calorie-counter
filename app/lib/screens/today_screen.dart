@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../models.dart';
 import '../services/db.dart';
@@ -116,7 +115,7 @@ class _TodayScreenState extends State<TodayScreen> {
             await _autoSyncSteps();
           },
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 130),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, bottomGap(context, 30)),
             children: [
               // ---------- header ----------
               Row(children: [
@@ -198,9 +197,9 @@ class _TodayScreenState extends State<TodayScreen> {
                     child: _QuickButton(
                         icon: Icons.photo_camera_outlined,
                         title: 'Scan food',
-                        sub: 'Take a photo',
+                        sub: 'Camera or gallery',
                         color: p.saffron,
-                        onTap: () => startPhotoScan(context, widget.date, ImageSource.camera))),
+                        onTap: () => chooseAndScan(context, widget.date))),
                 const SizedBox(width: 10),
                 Expanded(
                     child: _QuickButton(

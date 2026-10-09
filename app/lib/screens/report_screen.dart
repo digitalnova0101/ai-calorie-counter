@@ -73,7 +73,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Report card')),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 32), children: [
+      body: ListView(padding: EdgeInsets.fromLTRB(16, 4, 16, bottomGap(context)), children: [
         _Segment(weekly: _weekly, onChanged: (w) => setState(() => _weekly = w)),
         const SizedBox(height: 12),
         if (!ready)

@@ -288,7 +288,7 @@ class _CoachSheetState extends State<CoachSheet> {
           ]),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(12, 8, 12, 10 + MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.fromLTRB(12, 8, 12, 10 + MediaQuery.of(context).viewInsets.bottom + MediaQuery.paddingOf(context).bottom),
           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Expanded(
               child: TextField(

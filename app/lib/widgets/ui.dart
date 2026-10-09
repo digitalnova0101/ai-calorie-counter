@@ -276,13 +276,18 @@ class QuickChips<T> extends StatelessWidget {
 }
 
 /// Opens a bottom sheet in the app style.
+/// Bottom space so content is never hidden under the phone's nav bar or our tab bar.
+double bottomGap(BuildContext context, [double extra = 24]) =>
+    MediaQuery.paddingOf(context).bottom + extra;
+
 Future<T?> showAppSheet<T>(BuildContext context, WidgetBuilder builder) =>
     showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + MediaQuery.paddingOf(ctx).bottom),
         child: builder(ctx),
       ),
     );

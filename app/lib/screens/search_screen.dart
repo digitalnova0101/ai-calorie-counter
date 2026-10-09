@@ -104,7 +104,7 @@ class _SearchScreenState extends State<SearchScreen> {
           child: _results.isEmpty
               ? const Center(child: Muted('Not in the list. Use "Ask AI" above.'))
               : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, bottomGap(context, 100)),
                   itemCount: _results.length,
                   separatorBuilder: (_, __) => const Divider(),
                   itemBuilder: (_, i) {

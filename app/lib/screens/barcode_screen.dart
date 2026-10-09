@@ -109,7 +109,7 @@ class _BarcodeScreenState extends State<BarcodeScreen> {
     final prod = _product;
     return Scaffold(
       appBar: AppBar(title: const Text('Scan barcode')),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 32), children: [
+      body: ListView(padding: EdgeInsets.fromLTRB(16, 4, 16, bottomGap(context)), children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: SizedBox(

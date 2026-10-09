@@ -14,6 +14,49 @@ import 'result_screen.dart';
 import 'search_screen.dart';
 
 /// Opens the camera (or gallery) and sends the photo to the AI.
+/// Asks "Camera or gallery?" and then scans the photo.
+Future<void> chooseAndScan(BuildContext context, DateTime date) async {
+  final p = Palette.of(context);
+  final src = await showAppSheet<ImageSource>(context, (ctx) {
+    Widget opt(IconData icon, String title, String sub, Color c, ImageSource s) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Panel(
+            onTap: () => Navigator.pop(ctx, s),
+            radius: 18,
+            padding: const EdgeInsets.all(14),
+            child: Row(children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(15)),
+                child: Icon(icon, color: Colors.white),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15.5)),
+                  Muted(sub, size: 12.5),
+                ]),
+              ),
+              Icon(Icons.chevron_right, color: p.muted),
+            ]),
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        const H2('Scan food'),
+        const SizedBox(height: 12),
+        opt(Icons.photo_camera_outlined, 'Take a photo', 'Use the camera now', p.saffron, ImageSource.camera),
+        opt(Icons.photo_library_outlined, 'Upload from phone', 'Pick a photo from your gallery', p.leaf,
+            ImageSource.gallery),
+      ]),
+    );
+  });
+  if (src == null || !context.mounted) return;
+  await startPhotoScan(context, date, src);
+}
+
 Future<void> startPhotoScan(BuildContext context, DateTime date, ImageSource src) async {
   XFile? file;
   try {
@@ -224,6 +267,22 @@ class _AddSheet extends StatelessWidget {
                 Text('Take a photo and AI counts it',
                     style: TextStyle(color: p.forestInk.withValues(alpha: .75), fontSize: 13)),
               ]),
+            ),
+            Pressable(
+              onTap: onUpload,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: p.forestInk.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.photo_library_outlined, color: p.forestInk, size: 20),
+                  const SizedBox(height: 2),
+                  Text('Gallery',
+                      style: TextStyle(color: p.forestInk, fontSize: 11, fontWeight: FontWeight.w800)),
+                ]),
+              ),
             ),
           ]),
         ),

@@ -89,7 +89,7 @@ class _FastingScreenState extends State<FastingScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Fasting timer')),
-      body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 32), children: [
+      body: ListView(padding: EdgeInsets.fromLTRB(16, 4, 16, bottomGap(context)), children: [
         SizedBox(
           height: 58,
           child: ListView.separated(

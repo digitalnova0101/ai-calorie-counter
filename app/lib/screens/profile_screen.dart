@@ -124,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ]),
         );
 
-    return ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 130), children: [
+    return ListView(padding: EdgeInsets.fromLTRB(16, 12, 16, bottomGap(context, 30)), children: [
       Panel(
         child: Row(children: [
           Container(

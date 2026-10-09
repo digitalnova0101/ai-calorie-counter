@@ -140,7 +140,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
             for (var i = 0; i < sDays.length; i++)
               _stepDays <= 7
                   ? _wd[parseDay(sDays[i].date).weekday - 1]
-                  : ((sDays.length - 1 - i) % 5 == 0 ? '${parseDay(sDays[i].date).day}' : '')
+                  : (parseDay(sDays[i].date).day == 1
+                      ? '1 ${mo[parseDay(sDays[i].date).month - 1]}'
+                      : '${parseDay(sDays[i].date).day}')
           ];
           final bestI = steps.isEmpty ? -1 : steps.indexOf(steps.reduce(math.max));
           String dayName(int i) {
@@ -153,7 +155,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           }
 
           final hist = days == null ? <DayLog>[] : days.where((d) => d.meals.isNotEmpty).toList();
-          return ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 130), children: [
+          return ListView(padding: EdgeInsets.fromLTRB(16, 12, 16, bottomGap(context, 30)), children: [
             Row(children: [
               Expanded(child: Text('Progress', style: display(context, 22, weight: FontWeight.w700))),
               CoachTopButton(profile: prof),

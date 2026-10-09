@@ -383,6 +383,8 @@ class _GlassPainter extends CustomPainter {
 // ============================================================
 // Charts
 // ============================================================
+/// Bar chart that always starts from 0, shows a number on every bar and
+/// scrolls left and right when there are too many days to fit.
 class BarChart extends StatelessWidget {
   final List<String> labels;
   final List<double> values;
@@ -397,72 +399,171 @@ class BarChart extends StatelessWidget {
       required this.under,
       required this.over,
       this.highlight = -1});
+
+  static const _axisW = 36.0, _minSlot = 44.0, _height = 200.0;
+
+  /// A round top value for the axis (e.g. 2,500 or 10,000).
+  static double niceMax(double v) {
+    if (v <= 0) return 1;
+    final mag = math.pow(10, (math.log(v) / math.ln10).floor()).toDouble();
+    for (final m in [1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0]) {
+      if (m * mag >= v) return m * mag;
+    }
+    return 10 * mag;
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = Palette.of(context);
-    return SizedBox(
-      height: 180,
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0, end: 1),
-        duration: const Duration(milliseconds: 900),
-        curve: Curves.easeOutCubic,
-        builder: (_, k, __) => CustomPaint(
-          size: Size.infinite,
-          painter: _BarPainter(labels, values, goal, under, over, highlight, k, p),
-        ),
+    final maxVal = values.fold(0.0, math.max);
+    final top = niceMax(math.max(goal, maxVal) * 1.05);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        CustomPaint(size: const Size(20, 10), painter: _DashPainter(p.ink.withValues(alpha: 0.45))),
+        const SizedBox(width: 6),
+        Text('Goal ${fmtInt(goal)}',
+            style: TextStyle(fontSize: 12, color: p.muted, fontWeight: FontWeight.w800)),
+        const Spacer(),
+        if (values.length * _minSlot > 300)
+          Row(children: [
+            Icon(Icons.swipe, size: 15, color: p.muted),
+            const SizedBox(width: 4),
+            Text('Swipe', style: TextStyle(fontSize: 11.5, color: p.muted, fontWeight: FontWeight.w700)),
+          ]),
+      ]),
+      const SizedBox(height: 6),
+      SizedBox(
+        height: _height,
+        child: LayoutBuilder(builder: (context, box) {
+          final avail = box.maxWidth - _axisW;
+          final scroll = values.length * _minSlot > avail;
+          final w = scroll ? values.length * _minSlot : avail;
+          final chart = TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: const Duration(milliseconds: 900),
+            curve: Curves.easeOutCubic,
+            builder: (_, k, __) => CustomPaint(
+              size: Size(w, _height),
+              painter: _BarPainter(labels, values, goal, top, under, over, highlight, k, p),
+            ),
+          );
+          return Row(children: [
+            SizedBox(
+              width: _axisW,
+              height: _height,
+              child: CustomPaint(painter: _AxisPainter(top, p)),
+            ),
+            Expanded(
+              child: scroll
+                  ? SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      reverse: true, // opens on today; swipe right for older days
+                      physics: const BouncingScrollPhysics(),
+                      child: SizedBox(width: w, height: _height, child: chart),
+                    )
+                  : chart,
+            ),
+          ]);
+        }),
       ),
-    );
+    ]);
   }
+}
+
+// shared layout for the axis and the bars
+const _barTop = 22.0, _barBottom = 26.0;
+
+class _DashPainter extends CustomPainter {
+  final Color c;
+  _DashPainter(this.c);
+  @override
+  void paint(Canvas canvas, Size size) {
+    final pt = Paint()
+      ..color = c
+      ..strokeWidth = 1.6;
+    for (double x = 0; x < size.width; x += 7) {
+      canvas.drawLine(Offset(x, size.height / 2), Offset(math.min(x + 4, size.width), size.height / 2), pt);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashPainter o) => o.c != c;
+}
+
+String _short(double v) {
+  if (v >= 10000) return '${(v / 1000).toStringAsFixed(v >= 100000 ? 0 : 1).replaceAll('.0', '')}k';
+  return fmtInt(v);
+}
+
+class _AxisPainter extends CustomPainter {
+  final double top;
+  final Palette p;
+  _AxisPainter(this.top, this.p);
+  @override
+  void paint(Canvas canvas, Size size) {
+    final h = size.height - _barTop - _barBottom;
+    for (final f in [0.0, 0.5, 1.0]) {
+      final v = top * f;
+      final y = _barTop + (1 - f) * h;
+      final tp = TextPainter(
+          text: TextSpan(
+              text: v >= 1000 ? '${(v / 1000).toStringAsFixed(v % 1000 == 0 ? 0 : 1)}k' : v.round().toString(),
+              style: TextStyle(fontSize: 10.5, color: p.muted, fontWeight: FontWeight.w600)),
+          textDirection: TextDirection.ltr)
+        ..layout();
+      tp.paint(canvas, Offset(size.width - 6 - tp.width, y - tp.height / 2));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_AxisPainter o) => o.top != top;
 }
 
 class _BarPainter extends CustomPainter {
   final List<String> labels;
   final List<double> values;
-  final double goal, k;
+  final double goal, top, k;
   final Color under, over;
   final int highlight;
   final Palette p;
-  _BarPainter(this.labels, this.values, this.goal, this.under, this.over,
+  _BarPainter(this.labels, this.values, this.goal, this.top, this.under, this.over,
       this.highlight, this.k, this.p);
 
   void _text(Canvas c, String t, Offset at, double size, Color col,
-      {FontWeight w = FontWeight.w600, TextAlign align = TextAlign.center}) {
+      {FontWeight w = FontWeight.w600}) {
     final tp = TextPainter(
         text: TextSpan(text: t, style: TextStyle(fontSize: size, color: col, fontWeight: w)),
         textDirection: TextDirection.ltr)
       ..layout();
-    final dx = align == TextAlign.center ? tp.width / 2 : (align == TextAlign.right ? tp.width : 0.0);
-    tp.paint(c, at - Offset(dx, tp.height));
+    tp.paint(c, at - Offset(tp.width / 2, tp.height));
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    // goal legend at the top left, clear of the bars
-    const legend = 20.0, top = legend + 22, bottom = 26.0;
-    final h = size.height - top - bottom;
-    final maxVal = values.fold(0.0, math.max);
-    final maxV = math.max(goal, maxVal) * 1.08;
-    if (maxV <= 0) return;
-    double y(double v) => top + (1 - v / maxV) * h;
-    final n = values.length, gap = size.width / n, bw = math.min(28.0, gap * (n > 10 ? 0.62 : 0.56));
-    // grey tracks behind every bar
-    for (var i = 0; i < n; i++) {
-      final cx = gap * i + gap / 2;
-      canvas.drawRRect(
-          RRect.fromRectAndRadius(Rect.fromLTWH(cx - bw / 2, top, bw, h), Radius.circular(math.min(10, bw / 2))),
-          Paint()..color = p.plateTrack.withValues(alpha: 0.7));
+    final n = values.length;
+    if (n == 0) return;
+    final h = size.height - _barTop - _barBottom;
+    double y(double v) => _barTop + (1 - v / top) * h;
+    final gap = size.width / n, bw = math.min(26.0, gap * 0.56);
+    // light grid lines at 0, half and top
+    final grid = Paint()
+      ..color = p.line
+      ..strokeWidth = 1;
+    for (final f in [0.0, 0.5, 1.0]) {
+      final gy = _barTop + (1 - f) * h;
+      canvas.drawLine(Offset(0, gy), Offset(size.width, gy), grid);
     }
     // bars
-    final best = values.isEmpty ? -1 : values.indexOf(maxVal);
     for (var i = 0; i < n; i++) {
       final v = values[i] * k;
       final cx = gap * i + gap / 2;
-      final bh = values[i] > 0 ? math.max(6.0, (top + h) - y(v)) : 0.0;
-      if (bh <= 0) continue;
+      if (values[i] <= 0) continue;
+      final bh = math.max(4.0, (_barTop + h) - y(v));
       final col = values[i] > goal ? over : under;
-      final r = Rect.fromLTWH(cx - bw / 2, top + h - bh, bw, bh);
+      final r = Rect.fromLTWH(cx - bw / 2, _barTop + h - bh, bw, bh);
       canvas.drawRRect(
-          RRect.fromRectAndRadius(r, Radius.circular(math.min(10, bw / 2))),
+          RRect.fromRectAndCorners(r,
+              topLeft: Radius.circular(math.min(8, bw / 2)), topRight: Radius.circular(math.min(8, bw / 2))),
           Paint()
             ..shader = LinearGradient(
                     begin: Alignment.topCenter,
@@ -470,7 +571,7 @@ class _BarPainter extends CustomPainter {
                     colors: [col, col.withValues(alpha: i == highlight ? 0.75 : 0.5)])
                 .createShader(r));
     }
-    // goal line (drawn over the tracks so it is always visible)
+    // goal line
     final gy = y(goal);
     final dash = Paint()
       ..color = p.ink.withValues(alpha: 0.45)
@@ -478,32 +579,30 @@ class _BarPainter extends CustomPainter {
     for (double x = 0; x < size.width; x += 8) {
       canvas.drawLine(Offset(x, gy), Offset(math.min(x + 4, size.width), gy), dash);
     }
-    // legend: "- - Goal 8,000"
-    for (double x = 0; x < 18; x += 7) {
-      canvas.drawLine(Offset(x, legend / 2), Offset(x + 4, legend / 2), dash);
-    }
-    _text(canvas, 'Goal ${fmtInt(goal)}', Offset(24, legend / 2 + 7), 12, p.muted, w: FontWeight.w800, align: TextAlign.left);
-    // values only for today and the best day, so nothing overlaps
-    if (k > 0.95) {
-      for (final i in (n > 10 ? {best} : {highlight, best})) {
-        if (i < 0 || i >= n || values[i] <= 0) continue;
+    // a number on every bar
+    if (k > 0.6) {
+      final fs = gap >= 40 ? 10.5 : 9.5;
+      for (var i = 0; i < n; i++) {
+        if (values[i] <= 0) continue;
         final cx = gap * i + gap / 2;
-        final ty = math.max(top - 4, y(values[i]) - 6);
-        _text(canvas, fmtInt(values[i]), Offset(cx, ty), 11.5, p.ink, w: FontWeight.w800);
+        final ty = math.max(_barTop - 2, y(values[i] * k) - 4);
+        final txt = gap >= 40 ? fmtInt(values[i]) : _short(values[i]);
+        _text(canvas, txt, Offset(cx, ty), fs, i == highlight ? p.ink : p.ink.withValues(alpha: 0.75),
+            w: i == highlight ? FontWeight.w900 : FontWeight.w700);
       }
     }
+    // day labels
     for (var i = 0; i < n; i++) {
       final cx = gap * i + gap / 2;
-      final lbl = i == highlight ? (n > 10 ? 'Today' : 'Today') : labels[i];
+      final lbl = i == highlight ? 'Today' : labels[i];
       if (lbl.isEmpty) continue;
-      _text(canvas, lbl, Offset(n > 10 && i == highlight ? cx - 6 : cx, size.height - 6), n > 10 ? 11 : 12,
-          i == highlight ? p.ink : p.muted,
+      _text(canvas, lbl, Offset(cx, size.height - 6), 11.5, i == highlight ? p.ink : p.muted,
           w: i == highlight ? FontWeight.w800 : FontWeight.w600);
     }
   }
 
   @override
-  bool shouldRepaint(_BarPainter o) => o.k != k || o.values != values;
+  bool shouldRepaint(_BarPainter o) => o.k != k || o.values != values || o.top != top;
 }
 
 class WeightChart extends StatelessWidget {
