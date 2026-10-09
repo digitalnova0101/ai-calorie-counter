@@ -250,5 +250,5 @@ Installing CMake 3.22.1 in /usr/local/lib/android/sdk/cmake/3.22.1
 Note: /home/runner/.pub-cache/hosted/pub.dev/cloud_firestore-6.10.0/android/src/main/java/io/flutter/plugins/firebase/firestore/utils/PipelineStageHandlers.java uses unchecked or unsafe operations.
 Note: Recompile with -Xlint:unchecked for details.
 Caught exception: Already watching path: /home/runner/work/ai-calorie-counter/ai-calorie-counter/app/android
-Running Gradle task 'assembleRelease'...                          345.9s
+Running Gradle task 'assembleRelease'...                          445.3s
 ✓ Built build/app/outputs/flutter-apk/app-release.apk (65.4MB)
