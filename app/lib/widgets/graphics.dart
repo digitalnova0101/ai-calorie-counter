@@ -417,14 +417,14 @@ class BarChart extends StatelessWidget {
     final p = Palette.of(context);
     final maxVal = values.fold(0.0, math.max);
     final top = niceMax(math.max(goal, maxVal) * 1.05);
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return LayoutBuilder(builder: (context, outer) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         CustomPaint(size: const Size(20, 10), painter: _DashPainter(p.ink.withValues(alpha: 0.45))),
         const SizedBox(width: 6),
         Text('Goal ${fmtInt(goal)}',
             style: TextStyle(fontSize: 12, color: p.muted, fontWeight: FontWeight.w800)),
         const Spacer(),
-        if (values.length * _minSlot > 300)
+        if (values.length * _minSlot > outer.maxWidth - _axisW)
           Row(children: [
             Icon(Icons.swipe, size: 15, color: p.muted),
             const SizedBox(width: 4),
@@ -466,7 +466,7 @@ class BarChart extends StatelessWidget {
           ]);
         }),
       ),
-    ]);
+    ]));
   }
 }
 
