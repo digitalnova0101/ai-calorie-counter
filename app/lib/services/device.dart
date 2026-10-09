@@ -91,6 +91,28 @@ class StepsService {
       return null;
     }
   }
+
+  /// Copies steps for past days from Health Connect into the app.
+  /// The last 30 days once a day, otherwise just today and yesterday.
+  /// [save] writes one day; returns how many days were updated.
+  Future<int> syncRecent(Future<void> Function(DateTime day, int steps) save, {bool force = false}) async {
+    if (!await isConnected) return 0;
+    final now = DateTime.now();
+    final today = '${now.year}-${now.month}-${now.day}';
+    final full = force || await Prefs.getString('steps_full_sync', '') != today;
+    final days = full ? 30 : 2;
+    var n = 0;
+    for (var i = 0; i < days; i++) {
+      final d = now.subtract(Duration(days: i));
+      final v = await stepsFor(d);
+      if (v != null && v > 0) {
+        await save(d, v);
+        n++;
+      }
+    }
+    if (full) await Prefs.setString('steps_full_sync', today);
+    return n;
+  }
 }
 
 // ============================================================

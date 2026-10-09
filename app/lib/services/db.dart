@@ -91,8 +91,8 @@ class Db {
   Future<void> addWater(String date, int ml) => _dayDoc(date)
       .set({'date': date, 'waterMl': FieldValue.increment(ml)}, SetOptions(merge: true));
 
-  Future<void> setSteps(String date, int steps) =>
-      _editDay(date, (d) => d['steps'] = steps.clamp(0, 100000));
+  Future<void> setSteps(String date, int steps) => _dayDoc(date)
+      .set({'date': date, 'steps': steps.clamp(0, 100000)}, SetOptions(merge: true));
 
   Future<void> saveWorkout(String date, Workout w) => _editDay(date, (d) {
         final list = _list(d, 'workouts');

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models.dart';
 import '../services/db.dart';
+import '../services/device.dart';
 import '../services/goals.dart';
 import '../theme.dart';
 import '../widgets/graphics.dart';
@@ -35,6 +36,12 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _load() async {
+    try {
+      // pull past days' steps from Health Connect first (quick when already done today)
+      await StepsService.instance
+          .syncRecent((d, n) => Db.instance.setSteps(dayKey(d), n))
+          .timeout(const Duration(seconds: 12), onTimeout: () => 0);
+    } catch (_) {}
     try {
       final d = await Db.instance.recentDays(30);
       if (mounted) setState(() => _days = d);

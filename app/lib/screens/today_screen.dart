@@ -76,9 +76,8 @@ class _TodayScreenState extends State<TodayScreen> {
 
   /// If the user connected Health Connect, pull today's steps quietly.
   Future<void> _autoSyncSteps() async {
-    if (!await StepsService.instance.isConnected) return;
-    final n = await StepsService.instance.stepsFor(DateTime.now());
-    if (n != null && n > 0) await Db.instance.setSteps(dayKey(DateTime.now()), n);
+    // today, plus the last 30 days once a day (so Progress shows past days too)
+    await StepsService.instance.syncRecent((d, n) => Db.instance.setSteps(dayKey(d), n));
   }
 
   String _label() {

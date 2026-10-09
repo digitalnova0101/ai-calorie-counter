@@ -80,7 +80,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _connectSteps() async {
     final ok = await StepsService.instance.connect();
     await _loadPrefs();
-    if (mounted) toast(context, ok ? 'Steps connected' : 'Permission not given. You can still type steps.');
+    var days = 0;
+    if (ok) days = await StepsService.instance.syncRecent((d, n) => Db.instance.setSteps(dayKey(d), n), force: true);
+    if (mounted) {
+      toast(context, ok ? 'Steps connected · $days day${days == 1 ? '' : 's'} of steps added' : 'Permission not given. You can still type steps.');
+    }
   }
 
   @override

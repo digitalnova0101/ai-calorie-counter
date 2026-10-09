@@ -201,6 +201,8 @@ class _StepsSheetState extends State<_StepsSheet> {
     setState(() => _syncing = true);
     final ok = await StepsService.instance.connect();
     final n = ok ? await StepsService.instance.stepsFor(widget.date) : null;
+    // also fill in the past 30 days in the background
+    if (ok) StepsService.instance.syncRecent((d, v) => Db.instance.setSteps(dayKey(d), v), force: true);
     if (!mounted) return;
     setState(() => _syncing = false);
     if (n == null) {
