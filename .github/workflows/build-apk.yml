@@ -43,8 +43,21 @@ jobs:
             python3 ../tools/patch_android.py
             python3 ../tools/make_firebase_options.py ../google-services.json lib/firebase_options.dart com.digitalnova.aicaloriecounter
             flutter pub get
-            flutter build apk --release --dart-define=API_URL="$(cat ../config/api_url.txt 2>/dev/null | tr -d '[:space:]')"
+            if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then
+              echo "$UPLOAD_KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+              printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=upload-keystore.jks\n" "$UPLOAD_KEY_PASSWORD" "$UPLOAD_KEY_PASSWORD" > android/key.properties
+              echo "Signing with the Play Store upload key"
+            else
+              echo "No upload key secrets yet: test signing only"
+            fi
+            API="$(cat ../config/api_url.txt 2>/dev/null | tr -d '[:space:]')"
+            V="--build-name=1.0.${{ github.run_number }} --build-number=${{ github.run_number }}"
+            flutter build apk --release $V --dart-define=API_URL="$API"
+            if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then flutter build appbundle --release $V --dart-define=API_URL="$API"; fi
           } 2>&1 | tee ../build-log.txt
+        env:
+          UPLOAD_KEYSTORE_BASE64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
 
       - name: Publish the APK
         if: success()
@@ -53,10 +66,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp app/build/app/outputs/flutter-apk/app-release.apk AI-Calorie-Counter.apk
+          FILES="AI-Calorie-Counter.apk"
+          if [ -f app/build/app/outputs/bundle/release/app-release.aab ]; then cp app/build/app/outputs/bundle/release/app-release.aab AI-Calorie-Counter-PlayStore.aab; FILES="$FILES AI-Calorie-Counter-PlayStore.aab"; fi
           TAG="v1.0.${{ github.run_number }}"
-          gh release create "$TAG" AI-Calorie-Counter.apk \
+          gh release create "$TAG" $FILES \
             --title "AI Calorie Counter $TAG" \
-            --notes "Download **AI-Calorie-Counter.apk** below, open it on your Android phone and tap Install." \
+            --notes "Phone: download **AI-Calorie-Counter.apk** and tap Install. Play Store: upload **AI-Calorie-Counter-PlayStore.aab** (only present once the upload key is set)." \
             --latest
 
       - name: Save build log for checking

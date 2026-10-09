@@ -21,6 +21,25 @@ if "isCoreLibraryDesugaringEnabled" not in s:
     s = s.replace("compileOptions {", "compileOptions {\n        isCoreLibraryDesugaringEnabled = true", 1)
 if "desugar_jdk_libs" not in s:
     s += '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
+# release signing with the Play Store upload key (only when CI wrote android/key.properties)
+if "signingConfigs {" not in s:
+    s = s.replace("    buildTypes {", """    signingConfigs {
+        create("release") {
+            val kp = rootProject.file("key.properties")
+            if (kp.exists()) {
+                val props = java.util.Properties()
+                kp.inputStream().use { props.load(it) }
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+            }
+        }
+    }
+
+    buildTypes {""", 1)
+s = s.replace('signingConfig = signingConfigs.getByName("debug")',
+    'signingConfig = if (rootProject.file("key.properties").exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")', 1)
 open(g, "w").write(s)
 print(s)
 
