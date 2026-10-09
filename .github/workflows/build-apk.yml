@@ -50,7 +50,7 @@ jobs:
             else
               echo "No upload key secrets yet: test signing only"
             fi
-            API="$(cat ../config/api_url.txt 2>/dev/null | tr -d '[:space:]')"
+            API="$( (cat ../config/api_url.txt 2>/dev/null || true) | tr -d '[:space:]')"
             V="--build-name=1.0.${{ github.run_number }} --build-number=${{ github.run_number }}"
             flutter build apk --release --split-per-abi $V --dart-define=API_URL="$API"
             if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then flutter build appbundle --release $V --dart-define=API_URL="$API"; fi
