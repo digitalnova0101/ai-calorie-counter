@@ -122,4 +122,9 @@ void main() {
   testWidgets('bars2', (t) async => shot(t, 'bars2',
       BarChart(labels: const ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'], values: const [1526, 1369, 1715, 0, 1547, 1439, 1371],
           goal: 1530, under: Colors.orange, over: Colors.red, highlight: 6)));
+  testWidgets('bars30', (t) async => shot(t, 'bars30',
+      BarChart(
+          labels: [for (var i = 0; i < 30; i++) (29 - i) % 5 == 0 ? '${i + 10}' : ''],
+          values: [for (var i = 0; i < 30; i++) i % 4 == 0 ? 0.0 : 4000.0 + (i * 1733) % 9000],
+          goal: 10000, under: Colors.blue, over: Colors.green, highlight: 29)));
 }
