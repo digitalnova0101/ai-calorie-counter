@@ -153,3 +153,128 @@ Got dependencies!
 26 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 No upload key secrets yet: test signing only
+Running Gradle task 'assembleRelease'...                        
+e: file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/android/app/build.gradle.kts:37:34: Unresolved reference 'util'.
+e: file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/android/app/build.gradle.kts:38:34: Cannot infer type for type parameter 'R'. Specify it explicitly.
+Loading package information...                                                  
+Loading local repository...                                                     
+[                                       ] 3% Loading local repository...        
+[                                       ] 3% Fetch remote repository...         
+[=                                      ] 3% Fetch remote repository...         
+[=                                      ] 4% Fetch remote repository...         
+[=                                      ] 5% Fetch remote repository...         
+[==                                     ] 5% Fetch remote repository...         
+[==                                     ] 6% Fetch remote repository...         
+[==                                     ] 7% Fetch remote repository...         
+[==                                     ] 7% Computing updates...               
+[===                                    ] 8% Computing updates...               
+[===                                    ] 10% Computing updates...              
+[===                                    ] 10% Installing NDK (Side by side) 28.2
+[===                                    ] 10% Downloading android-ndk-r28c-linux
+[====                                   ] 10% Downloading android-ndk-r28c-linux
+[====                                   ] 11% Downloading android-ndk-r28c-linux
+[====                                   ] 12% Downloading android-ndk-r28c-linux
+[=====                                  ] 13% Downloading android-ndk-r28c-linux
+[=====                                  ] 14% Downloading android-ndk-r28c-linux
+[=====                                  ] 15% Downloading android-ndk-r28c-linux
+[======                                 ] 15% Downloading android-ndk-r28c-linux
+[======                                 ] 16% Downloading android-ndk-r28c-linux
+[======                                 ] 17% Downloading android-ndk-r28c-linux
+[=======                                ] 18% Downloading android-ndk-r28c-linux
+[=======                                ] 19% Downloading android-ndk-r28c-linux
+[=======                                ] 20% Downloading android-ndk-r28c-linux
+[========                               ] 20% Downloading android-ndk-r28c-linux
+[========                               ] 21% Downloading android-ndk-r28c-linux
+[========                               ] 22% Downloading android-ndk-r28c-linux
+[=========                              ] 23% Downloading android-ndk-r28c-linux
+[=========                              ] 24% Downloading android-ndk-r28c-linux
+[=========                              ] 25% Downloading android-ndk-r28c-linux
+[==========                             ] 25% Downloading android-ndk-r28c-linux
+[==========                             ] 26% Downloading android-ndk-r28c-linux
+[==========                             ] 27% Downloading android-ndk-r28c-linux
+[===========                            ] 28% Downloading android-ndk-r28c-linux
+[===========                            ] 29% Downloading android-ndk-r28c-linux
+[===========                            ] 30% Downloading android-ndk-r28c-linux
+[============                           ] 30% Downloading android-ndk-r28c-linux
+[============                           ] 31% Downloading android-ndk-r28c-linux
+[============                           ] 32% Downloading android-ndk-r28c-linux
+[============                           ] 33% Downloading android-ndk-r28c-linux
+[============                           ] 33% Unzipping...                      
+[============                           ] 33% Unzipping... android-ndk-r28c/    
+[============                           ] 33% Unzipping... android-ndk-r28c/READ
+[=============                          ] 33% Unzipping... android-ndk-r28c/READ
+[=============                          ] 33% Unzipping... android-ndk-r28c/meta
+[=============                          ] 33% Unzipping... android-ndk-r28c/shad
+[=============                          ] 33% Unzipping... android-ndk-r28c/ndk-
+[=============                          ] 33% Unzipping... android-ndk-r28c/wrap
+[=============                          ] 33% Unzipping... android-ndk-r28c/ndk-
+[=============                          ] 33% Unzipping... android-ndk-r28c/tool
+[=============                          ] 34% Unzipping... android-ndk-r28c/tool
+[=============                          ] 35% Unzipping... android-ndk-r28c/tool
+[==============                         ] 35% Unzipping... android-ndk-r28c/tool
+[==============                         ] 36% Unzipping... android-ndk-r28c/tool
+[==============                         ] 37% Unzipping... android-ndk-r28c/tool
+[===============                        ] 38% Unzipping... android-ndk-r28c/tool
+[===============                        ] 39% Unzipping... android-ndk-r28c/tool
+[===============                        ] 40% Unzipping... android-ndk-r28c/tool
+[================                       ] 40% Unzipping... android-ndk-r28c/tool
+[================                       ] 41% Unzipping... android-ndk-r28c/tool
+[================                       ] 42% Unzipping... android-ndk-r28c/tool
+[=================                      ] 43% Unzipping... android-ndk-r28c/tool
+[=================                      ] 44% Unzipping... android-ndk-r28c/tool
+[=================                      ] 45% Unzipping... android-ndk-r28c/tool
+[==================                     ] 45% Unzipping... android-ndk-r28c/tool
+[==================                     ] 46% Unzipping... android-ndk-r28c/tool
+[==================                     ] 47% Unzipping... android-ndk-r28c/tool
+[===================                    ] 48% Unzipping... android-ndk-r28c/tool
+[===================                    ] 49% Unzipping... android-ndk-r28c/tool
+[===================                    ] 50% Unzipping... android-ndk-r28c/tool
+[====================                   ] 50% Unzipping... android-ndk-r28c/tool
+[====================                   ] 51% Unzipping... android-ndk-r28c/tool
+[====================                   ] 52% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 53% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 54% Unzipping... android-ndk-r28c/tool
+[=====================                  ] 54% Unzipping... android-ndk-r28c/buil
+[=====================                  ] 54% Unzipping... android-ndk-r28c/sour
+[=====================                  ] 54% Unzipping... android-ndk-r28c/NOTI
+[=====================                  ] 54% Unzipping... android-ndk-r28c/ndk-
+[=====================                  ] 54% Unzipping... android-ndk-r28c/NOTI
+[=====================                  ] 54% Unzipping... android-ndk-r28c/pyth
+[=====================                  ] 54% Unzipping... android-ndk-r28c/preb
+[=====================                  ] 54% Unzipping... android-ndk-r28c/ndk-
+[=====================                  ] 54% Unzipping... android-ndk-r28c/sour
+[=====================                  ] 54% Unzipping... android-ndk-r28c/simp
+[=====================                  ] 55% Unzipping... android-ndk-r28c/simp
+[=====================                  ] 55% Unzipping... android-ndk-r28c/CHAN
+[=======================================] 100% Unzipping... android-ndk-r28c/CHA
+
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file '/home/runner/work/ai-calorie-counter/ai-calorie-counter/app/android/app/build.gradle.kts' line: 7
+
+* What went wrong:
+Script compilation errors:
+
+  Line 07: android {
+           ^ 'fun Project.android(configure: Action<BaseAppModuleExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.ApplicationExtension.
+               This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+  Line 37:                 val props = java.util.Properties()
+                                            ^ Unresolved reference 'util'.
+
+  Line 38:                 kp.inputStream().use { props.load(it) }
+                                            ^ Cannot infer type for type parameter 'R'. Specify it explicitly.
+
+3 errors
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1m 34s
+Running Gradle task 'assembleRelease'...                           95.1s
+Gradle task assembleRelease failed with exit code 1
