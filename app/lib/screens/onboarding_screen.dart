@@ -7,6 +7,7 @@ import '../theme.dart';
 import '../services/health_data.dart';
 import '../widgets/graphics.dart';
 import '../widgets/premium.dart';
+import 'auth_screen.dart';
 import 'onboarding_extras.dart';
 import '../widgets/ui.dart';
 
@@ -340,7 +341,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   borderSide: BorderSide(color: Palette.of(context).leaf, width: 2)),
             ),
           ),
-          const SizedBox(height: 24),
+          if (widget.initial == null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true))),
+                child: const Text('Already have an account? Log in', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+            ),
+          const SizedBox(height: 12),
           Row(children: [
             Expanded(child: _choice('👨', 'Male', null, _sex == 'male', () => setState(() => _sex = 'male'))),
             const SizedBox(width: 10),

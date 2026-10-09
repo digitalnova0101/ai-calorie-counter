@@ -167,7 +167,7 @@ class AuthGate extends StatelessWidget {
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) return const _Loading();
         final user = snap.data;
-        if (user == null) return const AuthScreen();
+        if (user == null) return const _GuestStart();
         return StreamBuilder<Profile?>(
           key: ValueKey(user.uid),
           stream: Db.instance.profileStream(),
@@ -224,6 +224,55 @@ class _SetupMissingApp extends StatelessWidget {
               style: TextStyle(fontSize: 16, height: 1.5),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// No account yet: start straight away as a guest (login is optional, in setup and Profile).
+class _GuestStart extends StatefulWidget {
+  const _GuestStart();
+  @override
+  State<_GuestStart> createState() => _GuestStartState();
+}
+
+class _GuestStartState extends State<_GuestStart> {
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _go();
+  }
+
+  Future<void> _go() async {
+    setState(() => _failed = false);
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+    } catch (_) {
+      if (mounted) setState(() => _failed = true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_failed) return const _Loading();
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Could not start. Check your internet connection.',
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: _go, child: const Text('Try again')),
+            TextButton(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true))),
+              child: const Text('Log in instead'),
+            ),
+          ]),
         ),
       ),
     );

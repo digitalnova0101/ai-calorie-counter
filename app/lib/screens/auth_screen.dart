@@ -6,7 +6,11 @@ import '../theme.dart';
 import '../widgets/ui.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  /// Opened from inside the app (setup or Profile): shows a back button and closes itself when done.
+  final bool popOnDone;
+  /// Start on "Create account" and keep the guest's data by linking it to the new email.
+  final bool saveGuest;
+  const AuthScreen({super.key, this.popOnDone = false, this.saveGuest = false});
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -14,7 +18,8 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _email = TextEditingController();
   final _pass = TextEditingController();
-  bool _signUp = false, _busy = false;
+  late bool _signUp = widget.saveGuest;
+  bool _busy = false;
   String? _error;
 
   @override
@@ -55,10 +60,20 @@ class _AuthScreenState extends State<AuthScreen> {
     });
     try {
       final auth = FirebaseAuth.instance;
-      if (_signUp) {
+      final guest = auth.currentUser;
+      if (_signUp && guest != null && guest.isAnonymous) {
+        // keep everything the guest already logged
+        await guest.linkWithCredential(EmailAuthProvider.credential(email: email, password: pass));
+        await guest.reload();
+      } else if (_signUp) {
         await auth.createUserWithEmailAndPassword(email: email, password: pass);
       } else {
         await auth.signInWithEmailAndPassword(email: email, password: pass);
+      }
+      if (widget.popOnDone && mounted) {
+        toast(context, _signUp ? 'Account saved. Your data is safe.' : 'Logged in');
+        Navigator.of(context).pop(true);
+        return;
       }
     } on FirebaseAuthException catch (e) {
       setState(() => _error = _message(e));
@@ -99,6 +114,7 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     final p = Palette.of(context);
     return Scaffold(
+      appBar: widget.popOnDone ? AppBar(backgroundColor: Colors.transparent) : null,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -118,8 +134,12 @@ class _AuthScreenState extends State<AuthScreen> {
                   Text('AI Calorie Counter',
                       textAlign: TextAlign.center, style: display(context, 26)),
                   const SizedBox(height: 6),
-                  const Muted('Snap your food. Know your calories and protein.',
-                      size: 15, align: TextAlign.center),
+                  Muted(
+                      widget.saveGuest
+                          ? 'Save your data with an email so you never lose it.'
+                          : (widget.popOnDone ? 'Log in to your account.' : 'Snap your food. Know your calories and protein.'),
+                      size: 15,
+                      align: TextAlign.center),
                   const SizedBox(height: 32),
                   TextField(
                     controller: _email,
@@ -160,6 +180,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   if (!_signUp)
                     TextButton(onPressed: _busy ? null : _forgot, child: const Text('Forgot password')),
+                  if (!widget.popOnDone) ...[
                   const SizedBox(height: 16),
                   Row(children: [
                     Expanded(child: Divider(color: p.line)),
@@ -174,6 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   const SizedBox(height: 6),
                   const Muted('You can add an email later in Profile to keep your data safe.', size: 12, align: TextAlign.center),
+                  ],
                 ],
               ),
             ),

@@ -9,6 +9,7 @@ import '../theme.dart';
 import '../widgets/graphics.dart';
 import '../widgets/premium.dart';
 import '../widgets/ui.dart';
+import 'auth_screen.dart';
 import 'onboarding_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -226,10 +227,96 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ]),
       ),
       const SizedBox(height: 12),
-      OutlinedButton(onPressed: () => FirebaseAuth.instance.signOut(), child: const Text('Sign out')),
+      _AccountPanel(),
       const SizedBox(height: 16),
       const Muted('Nutrition numbers are estimates, not medical advice. Talk to a doctor or dietitian before big diet changes.',
           size: 12, align: TextAlign.center),
     ]);
+  }
+}
+
+
+/// Account: save guest data with an email, log in / out, delete everything.
+class _AccountPanel extends StatelessWidget {
+  Future<void> _delete(BuildContext context) async {
+    final p = Palette.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete all my data?'),
+        content: const Text(
+            'This removes your profile, meals, water, steps, workouts and weight history from this app for good. It cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: p.danger, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete everything'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    try {
+      await Db.instance.deleteAllMyData();
+      final u = FirebaseAuth.instance.currentUser;
+      try {
+        await u?.delete(); // removes the login too
+      } on FirebaseAuthException catch (_) {
+        // needs a recent login: the data is already gone, just sign out
+      }
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) toast(context, 'All your data was deleted');
+    } catch (e) {
+      if (context.mounted) toast(context, 'Could not delete right now. Check your internet and try again.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.userChanges(),
+        builder: (context, _) => _panel(context),
+      );
+
+  Widget _panel(BuildContext context) {
+    final p = Palette.of(context);
+    final u = FirebaseAuth.instance.currentUser;
+    final guest = u == null || u.isAnonymous;
+    return Panel(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        const H2('Account'),
+        const SizedBox(height: 6),
+        Muted(guest
+            ? "You're using the app as a guest. Save your data with an email so you don't lose it if you change phone."
+            : 'Logged in as ${u?.email ?? ''}'),
+        const SizedBox(height: 12),
+        if (guest) ...[
+          FilledButton.icon(
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true, saveGuest: true))),
+            icon: const Icon(Icons.cloud_done_outlined),
+            label: const Text('Save my data with email'),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => const AuthScreen(popOnDone: true))),
+            child: const Text('Log in to my account'),
+          ),
+        ] else
+          OutlinedButton.icon(
+            onPressed: () => FirebaseAuth.instance.signOut(),
+            icon: const Icon(Icons.logout),
+            label: const Text('Log out'),
+          ),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: () => _delete(context),
+          style: TextButton.styleFrom(foregroundColor: p.danger),
+          icon: const Icon(Icons.delete_outline),
+          label: const Text('Delete all my data'),
+        ),
+      ]),
+    );
   }
 }

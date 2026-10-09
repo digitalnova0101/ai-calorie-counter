@@ -145,6 +145,23 @@ class Db {
     return out;
   }
 
+  /// Deletes every document of this user (days, weights, profile).
+  Future<void> deleteAllMyData() async {
+    for (final col in ['days', 'weights']) {
+      while (true) {
+        final q = await _userDoc.collection(col).limit(300).get();
+        if (q.docs.isEmpty) break;
+        final b = _fs.batch();
+        for (final d in q.docs) {
+          b.delete(d.reference);
+        }
+        await b.commit();
+      }
+    }
+    await _userDoc.delete();
+    current = null;
+  }
+
   // ---------- weight ----------
   Future<void> logWeight(String date, double kg) async {
     await _userDoc.collection('weights').doc(date).set({'date': date, 'kg': kg});
