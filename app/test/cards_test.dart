@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:aicaloriecounter/models.dart';
 import 'package:aicaloriecounter/screens/onboarding_extras.dart';
+import 'package:aicaloriecounter/screens/onboarding_screen.dart';
 import 'package:aicaloriecounter/services/health_data.dart';
 import 'package:aicaloriecounter/services/db.dart';
 import 'package:aicaloriecounter/theme.dart';
@@ -80,6 +81,20 @@ Future<void> shot(WidgetTester t, String name, Widget child, {bool dark = false}
   await expectLater(find.byKey(key), matchesGoldenFile('goldens/$name.png'));
 }
 
+/// A whole screen at phone size (390 x 844).
+Future<void> screenShot(WidgetTester t, String name, Widget screen) async {
+  t.view.physicalSize = const Size(390 * 2, 844 * 2);
+  t.view.devicePixelRatio = 2;
+  final key = GlobalKey();
+  await t.pumpWidget(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    theme: buildTheme(Brightness.light),
+    home: RepaintBoundary(key: key, child: screen),
+  ));
+  await t.pump(const Duration(seconds: 1));
+  await expectLater(find.byKey(key), matchesGoldenFile('goldens/$name.png'));
+}
+
 void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
   setUp(() {
@@ -116,6 +131,14 @@ void main() {
   testWidgets('tip', (t) async => shot(t, 'tip', TargetTipBox(tip: targetTip('lose', 75, 68, 172))));
   testWidgets('allergies', (t) async => shot(t, 'allergies',
       MultiChoice(choices: allergyChoices, selected: {'milk', 'peanuts'}, onChanged: () {})));
+  Profile imp(String units) => Profile(
+      name: 'Alex', sex: 'male', age: 25, heightCm: 175, weightKg: 69.4, activity: 'light',
+      goal: 'lose', targetWeightKg: 65, units: units,
+      goals: const Goals(kcal: 2000, protein: 110, carbs: 240, fat: 60, waterMl: 2500));
+  testWidgets('body_lb', (t) async => screenShot(t, 'body_lb', OnboardingScreen(initial: imp('imperial'), startStep: 1)));
+  testWidgets('target_lb', (t) async => screenShot(t, 'target_lb', OnboardingScreen(initial: imp('imperial'), startStep: 4)));
+  testWidgets('date_lb', (t) async => screenShot(t, 'date_lb', OnboardingScreen(initial: imp('imperial'), startStep: 5)));
+  testWidgets('body_kg', (t) async => screenShot(t, 'body_kg', OnboardingScreen(initial: imp('metric'), startStep: 1)));
   testWidgets('bars', (t) async => shot(t, 'bars',
       BarChart(labels: const ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'], values: const [0, 0, 0, 0, 0, 0, 10791],
           goal: 8000, under: Colors.blue, over: Colors.green, highlight: 6)));

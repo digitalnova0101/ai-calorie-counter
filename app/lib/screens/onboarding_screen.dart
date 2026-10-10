@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../models.dart';
@@ -15,7 +16,8 @@ import '../widgets/ui.dart';
 /// Setup steps. Also used to edit the profile later (pass [initial]).
 class OnboardingScreen extends StatefulWidget {
   final Profile? initial;
-  const OnboardingScreen({super.key, this.initial});
+  final int startStep; // used by layout tests
+  const OnboardingScreen({super.key, this.initial, this.startStep = 0});
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
@@ -31,7 +33,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'health',
         'plan',
       ];
-  int _step = 0;
+  late int _step = widget.startStep;
   late double _pace = widget.initial?.goal == 'gain' ? 0.25 : 0.5;
   late DateTime? _date = widget.initial != null && widget.initial!.targetDate.isNotEmpty
       ? DateTime.tryParse(widget.initial!.targetDate)
@@ -345,6 +347,112 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  /// Height in feet and inches: one row like the others; tap the value for a scroll picker.
+  Widget _heightImperial() {
+    final p = Palette.of(context);
+    final total = (_num(_ft) * 12 + _num(_in)).round().clamp(48, 90);
+    void setTotal(int t) {
+      final v = t.clamp(48, 90);
+      setState(() {
+        _ft.text = '${v ~/ 12}';
+        _in.text = '${v % 12}';
+      });
+    }
+
+    Widget btn(String t, VoidCallback f, String label) => Semantics(
+          button: true,
+          label: label,
+          child: Pressable(
+            onTap: f,
+            child: Container(
+              width: 52,
+              height: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.line),
+              ),
+              child: Text(t, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+            ),
+          ),
+        );
+    final big = display(context, 22, weight: FontWeight.w700);
+    final unit = TextStyle(color: p.muted, fontWeight: FontWeight.w800, fontSize: 15);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Panel(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        radius: 18,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Height', style: TextStyle(color: p.muted, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 6),
+          Row(children: [
+            btn('−', () => setTotal(total - 1), 'Shorter'),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Pressable(
+                onTap: () => _pickHeight(total, setTotal),
+                child: Container(
+                  height: 56,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: p.line, width: 1.5),
+                  ),
+                  child: Text.rich(TextSpan(children: [
+                    TextSpan(text: '${total ~/ 12}', style: big),
+                    TextSpan(text: ' ft   ', style: unit),
+                    TextSpan(text: '${total % 12}', style: big),
+                    TextSpan(text: ' in', style: unit),
+                  ])),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            btn('+', () => setTotal(total + 1), 'Taller'),
+          ]),
+        ]),
+      ),
+    );
+  }
+
+  Future<void> _pickHeight(int total, void Function(int) set) async {
+    var ft = total ~/ 12, inch = total % 12;
+    final ok = await showAppSheet<bool>(context, (ctx) {
+      Widget wheel(int count, int start, int initial, String unit, ValueChanged<int> on) => Expanded(
+            child: CupertinoPicker(
+              itemExtent: 44,
+              scrollController: FixedExtentScrollController(initialItem: initial - start),
+              onSelectedItemChanged: (i) => on(i + start),
+              children: [
+                for (var v = start; v < start + count; v++)
+                  Center(child: Text('$v $unit', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700))),
+              ],
+            ),
+          );
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const H2('Your height'),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 200,
+            child: Row(children: [
+              wheel(4, 4, ft, 'ft', (v) => ft = v),
+              wheel(12, 0, inch, 'in', (v) => inch = v),
+            ]),
+          ),
+          const SizedBox(height: 12),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Done')),
+        ]),
+      );
+    });
+    if (ok == true) set(ft * 12 + inch);
+  }
+
   Widget _dial(String label, TextEditingController c, String unit, double step) {
     final p = Palette.of(context);
     void bump(double d) {
@@ -425,11 +533,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 12),
           _dial('Age', _age, 'yrs', 1),
           if (_imperial)
-            Row(children: [
-              Expanded(child: _dial('Height', _ft, 'ft', 1)),
-              const SizedBox(width: 10),
-              Expanded(child: _dial('', _in, 'in', 1)),
-            ])
+            _heightImperial()
           else
             _dial('Height', _height, 'cm', 1),
           _dial('Weight', _weight, Units.w, _imperial ? 1 : 0.5),
