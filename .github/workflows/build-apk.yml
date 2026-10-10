@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           cd app
-          flutter test test/cards_test.dart --update-goldens 2>&1 | tail -60 > ../layout-log.txt || true
+          flutter test test/cards_test.dart --update-goldens > ../layout-log.txt 2>&1 || true
           mkdir -p ../layout && cp test/goldens/*.png ../layout/ 2>/dev/null || true
 
       - name: Publish the APK
