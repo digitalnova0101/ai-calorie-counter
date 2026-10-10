@@ -491,77 +491,6 @@ Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Reg
 There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
 If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
 
-══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
-The following StackOverflowError was thrown building OnboardingScreen(dirty, dependencies:
-[InheritedCupertinoTheme, _InheritedTheme, _LocalizationsScope-[GlobalKey#5dde9]], state:
-_OnboardingScreenState#2765f):
-Stack Overflow
-
-The relevant error-causing widget was:
-  OnboardingScreen
-  OnboardingScreen:file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:139:68
-
-When the exception was thrown, this was the stack:
-#0      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:3)
-#1      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#2      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#3      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#4      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#5      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#6      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#7      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#8      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#9      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#10     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#11     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#12     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#13     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#14     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#15     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#16     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#17     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#18     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#19     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#20     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#21     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#22     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#23     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#24     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#25     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#26     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#27     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#28     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#29     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#30     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#31     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#32     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#33     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#34     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#35     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#36     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#37     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#38     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#39     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#40     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#41     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#42     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#43     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-...
-...
-#400788 TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
-#400789 AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2250:27)
-#400790 WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
-#400793 TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
-#400794 WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
-#400795 screenShot (file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:89:11)
-#400796 main.<anonymous closure> (file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:139:41)
-#400797 testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
-#400806 FakeAsync.run.<anonymous closure>.<anonymous closure> (package:fake_async/fake_async.dart:189:18)
-#400807 FakeAsync.flushMicrotasks (package:fake_async/fake_async.dart:200:32)
-#400808 AutomatedTestWidgetsFlutterBinding.runTest.<anonymous closure> (package:flutter_test/src/binding.dart:2507:17)
-(elided 26 frames from dart:async and package:stack_trace)
-
-════════════════════════════════════════════════════════════════════════════════════════════════════
 ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
 The following _Exception was thrown running a test:
 Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found
@@ -577,11 +506,27 @@ When the exception was thrown, this was the stack:
 The test description was:
   target_lb
 ════════════════════════════════════════════════════════════════════════════════════════════════════
+Error: google_fonts was unable to load font Unbounded-Bold because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
 ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
-The following message was thrown:
-Multiple exceptions (2) were detected during the running of the current test, and at least one was
-unexpected.
+The following _Exception was thrown running a test (but after the test had completed):
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in
+the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
 ════════════════════════════════════════════════════════════════════════════════════════════════════
+Test failed. See exception logs above.
+The test description was: target_lb
+
 Test failed. See exception logs above.
 The test description was: target_lb
 
@@ -593,77 +538,6 @@ Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Reg
 There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
 If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
 
-══╡ EXCEPTION CAUGHT BY WIDGETS LIBRARY ╞═══════════════════════════════════════════════════════════
-The following StackOverflowError was thrown building OnboardingScreen(dirty, dependencies:
-[InheritedCupertinoTheme, _InheritedTheme, _LocalizationsScope-[GlobalKey#0432e]], state:
-_OnboardingScreenState#44a6e):
-Stack Overflow
-
-The relevant error-causing widget was:
-  OnboardingScreen
-  OnboardingScreen:file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:140:64
-
-When the exception was thrown, this was the stack:
-#0      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:3)
-#1      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#2      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#3      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#4      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#5      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#6      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#7      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#8      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#9      _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#10     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#11     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#12     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#13     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#14     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#15     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#16     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#17     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#18     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#19     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#20     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#21     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#22     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#23     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#24     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#25     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#26     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#27     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#28     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#29     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#30     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#31     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#32     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#33     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#34     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#35     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#36     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#37     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#38     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#39     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#40     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#41     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#42     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-#43     _OnboardingScreenState._wKg (package:aicaloriecounter/screens/onboarding_screen.dart:67:34)
-...
-...
-#414253 TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
-#414254 AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:2250:27)
-#414255 WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:598:22)
-#414258 TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
-#414259 WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:595:27)
-#414260 screenShot (file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:89:11)
-#414261 main.<anonymous closure> (file:///home/runner/work/ai-calorie-counter/ai-calorie-counter/app/test/cards_test.dart:140:39)
-#414262 testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:29)
-#414271 FakeAsync.run.<anonymous closure>.<anonymous closure> (package:fake_async/fake_async.dart:189:18)
-#414272 FakeAsync.flushMicrotasks (package:fake_async/fake_async.dart:200:32)
-#414273 AutomatedTestWidgetsFlutterBinding.runTest.<anonymous closure> (package:flutter_test/src/binding.dart:2507:17)
-(elided 26 frames from dart:async and package:stack_trace)
-
-════════════════════════════════════════════════════════════════════════════════════════════════════
 ══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
 The following _Exception was thrown running a test:
 Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found
@@ -678,11 +552,6 @@ When the exception was thrown, this was the stack:
 
 The test description was:
   date_lb
-════════════════════════════════════════════════════════════════════════════════════════════════════
-══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
-The following message was thrown:
-Multiple exceptions (2) were detected during the running of the current test, and at least one was
-unexpected.
 ════════════════════════════════════════════════════════════════════════════════════════════════════
 Error: google_fonts was unable to load font Unbounded-Bold because the following exception occurred:
 Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your pubspec's assets.
@@ -707,6 +576,142 @@ The test description was: date_lb
 
 Test failed. See exception logs above.
 The test description was: date_lb
+
+::endgroup::
+::group::❌ plan_lb (failed)
+Error: google_fonts was unable to load font Manrope-Regular because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found
+in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+
+The test description was:
+  plan_lb
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Error: google_fonts was unable to load font Unbounded-Bold because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test (but after the test had completed):
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in
+the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Error: google_fonts was unable to load font Unbounded-SemiBold because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-SemiBold was not found in the application assets. Ensure Unbounded-SemiBold.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test (but after the test had completed):
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-SemiBold was not
+found in the application assets. Ensure Unbounded-SemiBold.ttf exists in a folder that is included
+in your pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Test failed. See exception logs above.
+The test description was: plan_lb
+
+Test failed. See exception logs above.
+The test description was: plan_lb
+
+Test failed. See exception logs above.
+The test description was: plan_lb
+
+::endgroup::
+::group::❌ body_next (failed)
+Error: google_fonts was unable to load font Manrope-Regular because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Manrope-Regular was not found
+in the application assets. Ensure Manrope-Regular.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+
+The test description was:
+  body_next
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Error: google_fonts was unable to load font Unbounded-Bold because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test (but after the test had completed):
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in
+the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Error: google_fonts was unable to load font Unbounded-Bold because the following exception occurred:
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your pubspec's assets.
+
+There is likely something wrong with your test. Please see https://github.com/flutter/packages/blob/main/packages/google_fonts/example/test for examples of how to test with google_fonts.
+If troubleshooting doesn't solve the problem, please file an issue at https://github.com/flutter/flutter/issues/new/choose.
+
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following _Exception was thrown running a test (but after the test had completed):
+Exception: GoogleFonts.config.allowRuntimeFetching is false but font Unbounded-Bold was not found in
+the application assets. Ensure Unbounded-Bold.ttf exists in a folder that is included in your
+pubspec's assets.
+
+When the exception was thrown, this was the stack:
+#0      loadFontIfNecessary (package:google_fonts/src/google_fonts_base.dart:179:7)
+<asynchronous suspension>
+#1      googleFontsTextStyle.<anonymous closure> (package:google_fonts/src/google_fonts_base.dart:112:22)
+<asynchronous suspension>
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Test failed. See exception logs above.
+The test description was: body_next
+
+Test failed. See exception logs above.
+The test description was: body_next
+
+Test failed. See exception logs above.
+The test description was: body_next
 
 ::endgroup::
 ::group::❌ body_kg (failed)
@@ -838,4 +843,4 @@ The test description was: bars30
 LAYOUT PROBLEMS: 0
 ::endgroup::
 
-::error::0 tests passed, 19 failed.
+::error::0 tests passed, 21 failed.
