@@ -135,11 +135,25 @@ class Reminders {
     iOS: DarwinNotificationDetails(),
   );
 
+  /// Picks a time zone that matches the phone's clock right now (name first,
+  /// then the UTC offset), so reminders fire at local time anywhere.
+  static tz.Location _deviceLocation() {
+    final now = DateTime.now();
+    final off = now.timeZoneOffset.inMilliseconds, abbr = now.timeZoneName;
+    tz.Location? byOffset;
+    for (final loc in tz.timeZoneDatabase.locations.values) {
+      final z = loc.timeZone(now.millisecondsSinceEpoch);
+      if (z.offset != off) continue;
+      if (z.abbreviation == abbr) return loc;
+      byOffset ??= loc;
+    }
+    return byOffset ?? tz.UTC;
+  }
+
   Future<void> init() async {
     if (_ready) return;
     tzdata.initializeTimeZones();
-    // The app is built for India; change this if your users are elsewhere.
-    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+    tz.setLocalLocation(_deviceLocation());
     await _plugin.initialize(const InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       iOS: DarwinInitializationSettings(),

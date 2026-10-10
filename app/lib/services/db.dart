@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 import '../models.dart';
+import 'units.dart';
 
 String dayKey(DateTime d) => DateFormat('yyyy-MM-dd').format(d);
 DateTime parseDay(String key) => DateFormat('yyyy-MM-dd').parse(key);
@@ -38,12 +39,17 @@ class Db {
   Stream<Profile?> profileStream() => _userDoc.snapshots().map((s) {
         final d = s.data();
         if (d == null || d['goals'] == null) return null;
-        return current = Profile.fromMap(d);
+        final p = current = Profile.fromMap(d);
+        Units.apply(p);
+        return p;
       });
 
   Future<void> saveProfile(Profile p) => _userDoc.set(
       {...p.toMap(), 'updatedAt': FieldValue.serverTimestamp()},
       SetOptions(merge: true));
+
+  Future<void> setUnits(String units) =>
+      _userDoc.set({'units': units}, SetOptions(merge: true));
 
   Future<void> setStepGoal(int steps) =>
       _userDoc.set({'stepGoal': steps, 'stepGoalCustom': true}, SetOptions(merge: true));

@@ -1,5 +1,5 @@
 <?php
-// AI food scan for the AI Calorie Counter app (PHP version for shared hosting).
+// AI food scan for the CalDay app (PHP version for shared hosting).
 // Your keys are NOT in this file. They live in aicc-config.php, one folder ABOVE
 // public_html, so nobody can open it from the internet.
 
@@ -62,11 +62,11 @@ $names = array_map(fn($x) => mb_substr($x, 0, 60), $names);
 if (!$img && !$text) out(400, ['error' => 'Send a photo or a description.']);
 if (strlen($img) > 2000000) out(400, ['error' => 'Photo is too large. Try again.']);
 
-$list = $names ? "\nIf a food matches a name in THALI LIST, use the short form {\"db\": \"<exact list name>\", \"grams\": <grams eaten>, \"portion\": \"2 medium\"}.\nTHALI LIST: " . implode('; ', $names) : '';
-$schema = "Reply with ONLY one JSON object, no other text:\n{\"dish\": \"short meal name\",\n \"items\": [ {\"name\": \"Food name\", \"portion\": \"1 bowl\", \"grams\": 150, \"kcal\": 210, \"protein\": 9, \"carbs\": 30, \"fat\": 6} ],\n \"note\": \"one short simple-English sentence about assumptions (oil, portion size)\"}\nNumbers are for the whole portion eaten, not per 100 g. Protein, carbs and fat in grams.\nUse Indian home-cooking norms (IFCT values, typical recipes) and include cooking oil or ghee.$list\nIf there is no food, return {\"dish\":\"\",\"items\":[],\"note\":\"No food found.\"}";
-$intro = "You are a nutrition estimator for an Indian calorie tracking app.\n";
+$list = $names ? "\nIf a food matches a name in FOOD LIST, use the short form {\"db\": \"<exact list name>\", \"grams\": <grams eaten>, \"portion\": \"2 medium\"}.\nFOOD LIST: " . implode('; ', $names) : '';
+$schema = "Reply with ONLY one JSON object, no other text:\n{\"dish\": \"short meal name\",\n \"items\": [ {\"name\": \"Food name\", \"portion\": \"1 bowl\", \"grams\": 150, \"kcal\": 210, \"protein\": 9, \"carbs\": 30, \"fat\": 6} ],\n \"note\": \"one short simple-English sentence about assumptions (oil, portion size)\"}\nNumbers are for the whole portion eaten, not per 100 g. Protein, carbs and fat in grams.\nFirst recognise the cuisine (Indian, American, Mexican, Chinese, Japanese, Italian, Middle Eastern and so on), then use typical recipes and standard nutrition data for that cuisine (USDA for Western foods, IFCT for Indian foods). Include cooking oil, butter, ghee or dressing. Use the common English food name, keeping well-known local names (for example \"Dal tadka\", \"Pad thai\").$list\nIf there is no food, return {\"dish\":\"\",\"items\":[],\"note\":\"No food found.\"}";
+$intro = "You are a nutrition estimator for a calorie tracking app used worldwide.\n";
 $parts = $img
-  ? [['text' => $intro . "Look at this food photo. Identify each distinct food item and estimate its portion from visual cues (plate, katori, hand size).\n\n" . $schema],
+  ? [['text' => $intro . "Look at this food photo. Identify each distinct food item and estimate its portion from visual cues (plate, bowl, cup, katori, cutlery, hand size).\n\n" . $schema],
      ['inline_data' => ['mime_type' => 'image/jpeg', 'data' => $img]]]
   : [['text' => $intro . 'The user ate: "' . mb_substr($text, 0, 500) . "\". Split it into items and estimate each. If a quantity is missing, assume one normal serving.\n\n" . $schema]];
 

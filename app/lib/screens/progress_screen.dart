@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models.dart';
 import '../services/db.dart';
+import '../services/units.dart';
 import '../services/device.dart';
 import '../services/goals.dart';
 import '../theme.dart';
@@ -52,10 +53,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
   }
 
   Future<void> _logWeight(double current) async {
-    final ctrl = TextEditingController(text: current.toStringAsFixed(1));
-    final kg = await showAppSheet<double>(context, (ctx) {
+    final ctrl = TextEditingController(text: Units.toW(current).toStringAsFixed(1));
+    final typed = await showAppSheet<double>(context, (ctx) {
       void bump(double d) {
-        final v = (double.tryParse(ctrl.text.replaceAll(',', '.')) ?? current) + d;
+        final v = (double.tryParse(ctrl.text.replaceAll(',', '.')) ?? Units.toW(current)) + d;
         ctrl.text = v.toStringAsFixed(1);
       }
 
@@ -67,7 +68,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
           NumberStepper(
             controller: ctrl,
             decimal: true,
-            suffix: 'kg',
+            suffix: Units.w,
             onChanged: (_) {},
             onMinus: () => bump(-0.1),
             onPlus: () => bump(0.1),
@@ -81,9 +82,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
       );
     });
     ctrl.dispose();
-    if (kg == null) return;
+    if (typed == null) return;
+    final kg = Units.fromW(typed);
     if (kg < 30 || kg > 250) {
-      if (mounted) toast(context, 'Enter a weight between 30 and 250 kg');
+      if (mounted) toast(context, 'Enter a weight between ${Units.weight(30, 0)} and ${Units.weight(250, 0)}');
       return;
     }
     await Db.instance.logWeight(dayKey(DateTime.now()), kg);

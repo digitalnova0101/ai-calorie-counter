@@ -4,7 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../models.dart';
 
-/// Offline list of common Indian foods (assets/foods_in.json).
+/// Offline list of common foods from India and around the world (assets/foods_in.json).
 /// Values are approximate, per the listed home-style serving.
 class FoodDb {
   FoodDb._();

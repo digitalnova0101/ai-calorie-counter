@@ -26,7 +26,7 @@ class AiException implements Exception {
 /// address (https://yourdomain.com/api/analyze.php) or a Vercel site (https://x.vercel.app).
 const String kApiUrl = String.fromEnvironment('API_URL');
 
-/// The AI names each food; when it's in our Indian food list the numbers come
+/// The AI names each food; when it's in our built-in food list the numbers come
 /// from the list, which keeps the reply short (fast) and the numbers consistent.
 class AiService {
   AiService._();

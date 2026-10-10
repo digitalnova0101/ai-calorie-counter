@@ -138,7 +138,7 @@ Future<void> _describe(BuildContext context, DateTime date) async {
           autofocus: true,
           minLines: 2,
           maxLines: 4,
-          decoration: const InputDecoration(hintText: '2 roti, 1 bowl dal, half plate rice and salad'),
+          decoration: const InputDecoration(hintText: '2 eggs, toast and a latte, or 2 roti with dal'),
         ),
         const SizedBox(height: 14),
         FilledButton(onPressed: () => Navigator.pop(ctx, ctrl.text.trim()), child: const Text('Count it')),
@@ -297,7 +297,7 @@ class _AddSheet extends StatelessWidget {
           children: [
             act('Upload photo', 'From your gallery', Icons.photo_library_outlined, p.leaf, onUpload, 0),
             act('Barcode', 'Packaged food', Icons.qr_code_scanner, p.water, onBarcode, 1),
-            act('Search', 'Roti, dal, paneer…', Icons.search, p.wheat, onSearch, 2),
+            act('Search', 'Eggs, rice, pizza…', Icons.search, p.wheat, onSearch, 2),
             act('Describe', 'Type what you ate', Icons.edit_note, p.chili, onDescribe, 3),
           ],
         ),

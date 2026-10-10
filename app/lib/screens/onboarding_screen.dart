@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../services/db.dart';
 import '../services/goals.dart';
+import '../services/units.dart';
 import '../theme.dart';
 import '../services/health_data.dart';
 import '../widgets/graphics.dart';
@@ -42,12 +43,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   late final _name = TextEditingController(text: widget.initial?.name ?? '');
   late final _age = TextEditingController(text: '${widget.initial?.age ?? 25}');
+  // kg/cm or lb/ft-in. Fields hold what the user sees; getters below give metric.
+  late bool _imperial = () {
+    final u = widget.initial?.units ?? '';
+    final v = u.isEmpty ? Units.deviceDefault() : u == 'imperial';
+    Units.imperial = v;
+    return v;
+  }();
   late final _height =
       TextEditingController(text: (widget.initial?.heightCm ?? 170).toStringAsFixed(0));
-  late final _weight =
-      TextEditingController(text: _fmt(widget.initial?.weightKg ?? 70));
+  late final _ft = TextEditingController(text: '${_inchesOf(widget.initial?.heightCm ?? 170) ~/ 12}');
+  late final _in = TextEditingController(text: '${_inchesOf(widget.initial?.heightCm ?? 170) % 12}');
+  late final _weight = TextEditingController(text: _fmtW(widget.initial?.weightKg ?? 70));
   late final _target = TextEditingController(
-      text: _fmt((widget.initial?.targetWeightKg ?? 0) > 0 ? widget.initial!.targetWeightKg : 65));
+      text: _fmtW((widget.initial?.targetWeightKg ?? 0) > 0 ? widget.initial!.targetWeightKg : 65));
+
+  static int _inchesOf(double cm) => (cm / Units.cmPerIn).round();
+  String _fmtW(double kg) =>
+      _fmt(_imperial ? (kg * Units.lbPerKg).roundToDouble() : (kg * 2).roundToDouble() / 2);
+  double get _hCm => _imperial ? (_num(_ft) * 12 + _num(_in)) * Units.cmPerIn : _hCm;
+  double get _wKg => _imperial ? _wKg / Units.lbPerKg : _wKg;
+  double get _tKg => _imperial ? _tKg / Units.lbPerKg : _tKg;
+
+  void _setImperial(bool v) {
+    if (v == _imperial) return;
+    final h = _hCm, w = _wKg, t = _tKg;
+    setState(() {
+      _imperial = v;
+      Units.imperial = v;
+      _height.text = h.round().toString();
+      _ft.text = '${_inchesOf(h) ~/ 12}';
+      _in.text = '${_inchesOf(h) % 12}';
+      _weight.text = _fmtW(w);
+      _target.text = _fmtW(t);
+    });
+  }
   late String _sex = widget.initial?.sex ?? 'male';
   late String _activity = widget.initial?.activity ?? 'light';
   late String _goal = widget.initial?.goal ?? 'lose';
@@ -60,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _age, _height, _weight, _target, _gK, _gP, _gC, _gF, _gW]) {
+    for (final c in [_name, _age, _height, _ft, _in, _weight, _target, _gK, _gP, _gC, _gF, _gW]) {
       c.dispose();
     }
     super.dispose();
@@ -71,16 +101,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String? _validate() {
     final s = _steps[_step];
     if (s == 'body') {
-      final a = _num(_age), h = _num(_height), w = _num(_weight);
+      final a = _num(_age), h = _hCm, w = _wKg;
       if (a < 13 || a > 100) return 'Enter an age between 13 and 100.';
-      if (h < 120 || h > 230) return 'Enter a height between 120 and 230 cm.';
-      if (w < 30 || w > 250) return 'Enter a weight between 30 and 250 kg.';
+      if (h < 120 || h > 230) return 'Enter a height between ${Units.height(120)} and ${Units.height(230)}.';
+      if (w < 30 || w > 250) return 'Enter a weight between ${Units.weight(30, 0)} and ${Units.weight(250, 0)}.';
     }
     if (s == 'target') {
-      final t = _num(_target), w = _num(_weight);
-      if (t < 30 || t > 250) return 'Enter a target weight between 30 and 250 kg.';
-      if (_goal == 'lose' && t >= w) return 'To lose weight, pick a goal below your weight now (${_fmt(w)} kg).';
-      if (_goal == 'gain' && t <= w) return 'To gain weight, pick a goal above your weight now (${_fmt(w)} kg).';
+      final t = _tKg, w = _wKg;
+      if (t < 30 || t > 250) return 'Enter a target weight between ${Units.weight(30, 0)} and ${Units.weight(250, 0)}.';
+      if (_goal == 'lose' && t >= w) return 'To lose weight, pick a goal below your weight now (${Units.weight(w)}).';
+      if (_goal == 'gain' && t <= w) return 'To gain weight, pick a goal above your weight now (${Units.weight(w)}).';
     }
     return null;
   }
@@ -91,17 +121,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       setState(() => _error = err);
       return;
     }
-    if (_steps[_step] == 'goal' && _goal != 'maintain' && _num(_target) <= 0) _target.text = _fmt(_num(_weight));
-    if (_steps[_step] == 'target') _date ??= dateForPace(_num(_weight), _num(_target), _pace);
+    if (_steps[_step] == 'goal' && _goal != 'maintain' && _tKg <= 0) _target.text = _weight.text;
+    if (_steps[_step] == 'target') _date ??= dateForPace(_wKg, _tKg, _pace);
     if (_step + 1 < _steps.length && _steps[_step + 1] == 'plan') {
       final g = goalsWithPace(
           sex: _sex,
           age: _num(_age).round(),
-          heightCm: _num(_height),
-          weightKg: _num(_weight),
+          heightCm: _hCm,
+          weightKg: _wKg,
           activity: _activity,
           goal: _goal,
-          paceKgWeek: _goal == 'maintain' ? 0 : paceOf(_num(_weight), _num(_target), _date));
+          paceKgWeek: _goal == 'maintain' ? 0 : paceOf(_wKg, _tKg, _date));
       _gK.text = '${g.kcal}';
       _gP.text = '${g.protein}';
       _gC.text = '${g.carbs}';
@@ -121,18 +151,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _save() async {
     int v(TextEditingController c, int lo, int hi, int fb) =>
         (int.tryParse(c.text.trim()) ?? fb).clamp(lo, hi);
-    final weight = _num(_weight);
+    final weight = _wKg;
     final profile = Profile(
       name: _name.text.trim(),
       sex: _sex,
       age: _num(_age).round(),
-      heightCm: _num(_height),
+      heightCm: _hCm,
       weightKg: weight,
       activity: _activity,
       goal: _goal,
-      targetWeightKg: _goal == 'maintain' ? weight : _num(_target),
+      targetWeightKg: _goal == 'maintain' ? weight : _tKg,
       stepGoal: widget.initial?.stepGoal ?? 8000,
       stepGoalCustom: widget.initial?.stepGoalCustom ?? false,
+      units: _imperial ? 'imperial' : 'metric',
       targetDate: _goal == 'maintain' || _date == null ? '' : dayKey(_date!),
       allergies: _allergies.where((x) => x != 'none').toList(),
       concerns: _concerns.where((x) => x != 'none').toList(),
@@ -284,6 +315,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  Widget _unitSwitch() {
+    final p = Palette.of(context);
+    Widget opt(String t, bool imp) {
+      final sel = _imperial == imp;
+      return Expanded(
+        child: Pressable(
+          onTap: () => _setImperial(imp),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 11),
+            decoration: BoxDecoration(
+              color: sel ? p.surface : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: sel ? [BoxShadow(color: Colors.black.withValues(alpha: .08), blurRadius: 8, offset: const Offset(0, 2))] : null,
+            ),
+            child: Text(t,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.w800, color: sel ? p.ink : p.muted)),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(color: p.line.withValues(alpha: .6), borderRadius: BorderRadius.circular(15)),
+      child: Row(children: [opt('kg · cm', false), opt('lb · ft', true)]),
+    );
+  }
+
   Widget _dial(String label, TextEditingController c, String unit, double step) {
     final p = Palette.of(context);
     void bump(double d) {
@@ -297,7 +358,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
         radius: 18,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(color: p.muted, fontWeight: FontWeight.w700)),
+          Text(label.isEmpty ? ' ' : label, style: TextStyle(color: p.muted, fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
           NumberStepper(
             controller: c,
@@ -325,7 +386,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             textInputAction: TextInputAction.done,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
             decoration: InputDecoration(
-              hintText: 'e.g. Rahul',
+              hintText: 'e.g. Alex',
               hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Palette.of(context).muted.withValues(alpha: .6)),
               prefixIcon: const Padding(
                 padding: EdgeInsets.only(left: 16, right: 10),
@@ -360,9 +421,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       case 'body':
         return [
           _title('Your body', 'Used to work out your calorie burn and BMI.'),
+          _unitSwitch(),
+          const SizedBox(height: 12),
           _dial('Age', _age, 'yrs', 1),
-          _dial('Height', _height, 'cm', 1),
-          _dial('Weight', _weight, 'kg', 0.5),
+          if (_imperial)
+            Row(children: [
+              Expanded(child: _dial('Height', _ft, 'ft', 1)),
+              const SizedBox(width: 10),
+              Expanded(child: _dial('', _in, 'in', 1)),
+            ])
+          else
+            _dial('Height', _height, 'cm', 1),
+          _dial('Weight', _weight, Units.w, _imperial ? 1 : 0.5),
         ];
       case 'activity':
         const acts = [
@@ -376,8 +446,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ...acts.map((a) => _choice(a[1], a[2], a[3], _activity == a[0], () => setState(() => _activity = a[0]))),
         ];
       case 'goal':
-        const goals = [
-          ['lose', '📉', 'Lose weight', 'About 0.5 kg a week'],
+        final goals = [
+          ['lose', '📉', 'Lose weight', _imperial ? 'About 1 lb a week' : 'About 0.5 kg a week'],
           ['maintain', '⚖️', 'Stay where I am', 'Keep my weight steady'],
           ['gain', '💪', 'Build muscle', 'Slow, lean gain'],
         ];
@@ -387,16 +457,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 _goal = g[0];
                 _pace = g[0] == 'gain' ? 0.25 : 0.5;
                 _date = null;
-                final w = _num(_weight);
-                if (g[0] == 'lose' && _num(_target) >= w) _target.text = _fmt((w * 0.9 * 2).roundToDouble() / 2);
-                if (g[0] == 'gain' && _num(_target) <= w) _target.text = _fmt(((w + 4) * 2).roundToDouble() / 2);
+                final w = _wKg;
+                if (g[0] == 'lose' && _tKg >= w) _target.text = _fmtW(w * 0.9);
+                if (g[0] == 'gain' && _tKg <= w) _target.text = _fmtW(w + 4);
               }))),
         ];
       case 'target':
-        final tip = targetTip(_goal, _num(_weight), _num(_target), _num(_height));
+        final tip = targetTip(_goal, _wKg, _tKg, _hCm);
         return [
-          _title("What's your goal weight?", 'You are ${_fmt(_num(_weight))} kg now.'),
-          _dial('Goal weight', _target, 'kg', 0.5),
+          _title("What's your goal weight?", 'You are ${Units.weight(_wKg)} now.'),
+          _dial('Goal weight', _target, Units.w, _imperial ? 1 : 0.5),
           TargetTipBox(tip: tip),
         ];
       case 'date':
@@ -404,8 +474,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _title('How fast do you want to go?', 'Pick a pace. We work out the date for you.'),
           PacePicker(
             lose: _goal == 'lose',
-            weight: _num(_weight),
-            target: _num(_target),
+            weight: _wKg,
+            target: _tKg,
             date: _date,
             onDate: (d) => setState(() => _date = d),
           ),
@@ -474,13 +544,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (_goal != 'maintain') ...[
             PlanGoalCard(
                 lose: _goal == 'lose',
-                weight: _num(_weight),
-                target: _num(_target),
-                heightCm: _num(_height),
-                date: _date ?? dateForPace(_num(_weight), _num(_target), _goal == 'gain' ? 0.25 : 0.5)),
+                weight: _wKg,
+                target: _tKg,
+                heightCm: _hCm,
+                date: _date ?? dateForPace(_wKg, _tKg, _goal == 'gain' ? 0.25 : 0.5)),
             const SizedBox(height: 12),
           ],
-          Panel(child: BmiCard(weightKg: _num(_weight), heightCm: _num(_height))),
+          Panel(child: BmiCard(weightKg: _wKg, heightCm: _hCm)),
           const SizedBox(height: 12),
           tgt('Calories', _gK, p.saffron,
               sub: _goal == 'lose'

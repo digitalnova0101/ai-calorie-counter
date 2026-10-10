@@ -32,7 +32,7 @@ class CalorieApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'AI Calorie Counter',
+      title: 'CalDay',
       debugShowCheckedModeBanner: false,
       theme: buildTheme(Brightness.light),
       darkTheme: buildTheme(Brightness.dark),
@@ -113,7 +113,7 @@ class _Splash extends StatelessWidget {
                 opacity: seg(0.5, 0.85),
                 child: Transform.translate(
                   offset: Offset(0, 10 * (1 - seg(0.5, 0.85))),
-                  child: Text('AI Calorie Counter', style: display(context, 24)),
+                  child: Text('CalDay', style: display(context, 24)),
                 ),
               ),
               const SizedBox(height: 6),
@@ -218,7 +218,7 @@ class _SetupMissingApp extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(32),
             child: Text(
-              'AI Calorie Counter\n\nAlmost ready! This test build is not connected to Firebase yet. '
+              'CalDay\n\nAlmost ready! This test build is not connected to Firebase yet. '
               'Add google-services.json to the project and a new APK will be built.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, height: 1.5),

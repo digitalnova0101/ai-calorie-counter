@@ -1,5 +1,5 @@
 <?php
-// AI coach chat for the AI Calorie Counter app (PHP, shared hosting).
+// AI coach chat for the CalDay app (PHP, shared hosting).
 // Uses the same aicc-config.php (one folder above public_html) as analyze.php.
 header('Content-Type: application/json; charset=utf-8');
 function out($code, $data) { http_response_code($code); echo json_encode($data); exit; }
@@ -49,13 +49,13 @@ foreach (array_slice($in['messages'] ?? [], -12) as $msg) {
 }
 if (!$contents || end($contents)['role'] !== 'user') out(400, ['error' => 'Ask a question first.']);
 
-$rules = 'You are "AI Coach", a friendly Indian nutrition coach inside the app "AI Calorie Counter".
+$rules = 'You are "AI Coach", a friendly nutrition coach inside the app "CalDay". Users live all over the world.
 Use the USER DATA to give personal answers.
 Rules:
-- Start with a direct answer in the first line (for example "Yes, 1 samosa is fine today" or "Better to skip it today").
+- Start with a direct answer in the first line (for example "Yes, 1 slice of pizza is fine today" or "Better to skip it today").
 - Then 2 to 4 short lines with real numbers: calories and protein of the food, and what will be left for today after eating it.
-- Prefer Indian foods, Indian portions (katori, roti, piece) and give one healthier swap when useful.
-- Reply in the same language and style the user writes in (English, Hindi or Hinglish). Use simple words.
+- Suggest foods from the user\'s own food culture: look at what they ate and asked about (Indian, American, European, Asian and so on). Use portions they know (cup, slice, bowl, katori, roti, piece) and their units from USER DATA (kg or lb). Give one healthier swap when useful.
+- Reply in the same language and style the user writes in (any language, including Hinglish). Use simple words.
 - Keep it under 110 words. You may use **bold** and "- " bullet lines. No headings, no tables.
 - If a food has something from the user\'s allergies, warn clearly first.
 - Respect health concerns (for blood sugar: low-GI choices; for BP: less salt; and so on).

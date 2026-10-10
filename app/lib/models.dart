@@ -76,6 +76,7 @@ class Profile {
   final String targetDate; // yyyy-MM-dd, '' when not set
   final List<String> allergies, concerns;
   final bool stepGoalCustom; // true when the user typed their own step goal
+  final String units; // 'metric', 'imperial', or '' to follow the phone
 
   const Profile({
     required this.name,
@@ -93,6 +94,7 @@ class Profile {
     this.allergies = const [],
     this.concerns = const [],
     this.stepGoalCustom = false,
+    this.units = '',
   });
 
   factory Profile.fromMap(Map<String, dynamic> m) => Profile(
@@ -111,6 +113,7 @@ class Profile {
         allergies: ((m['allergies'] as List?) ?? []).map((e) => '$e').toList(),
         concerns: ((m['concerns'] as List?) ?? []).map((e) => '$e').toList(),
         stepGoalCustom: m['stepGoalCustom'] == true,
+        units: '${m['units'] ?? ''}',
       );
 
   Map<String, dynamic> toMap() => {
@@ -128,6 +131,7 @@ class Profile {
         'allergies': allergies,
         'concerns': concerns,
         'stepGoalCustom': stepGoalCustom,
+        'units': units,
       };
 }
 

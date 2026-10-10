@@ -9,6 +9,7 @@ import '../services/health_data.dart';
 import '../theme.dart';
 import '../widgets/premium.dart';
 import '../widgets/ui.dart';
+import '../services/units.dart';
 
 const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 String niceDate(DateTime d) => '${d.day} ${_months[d.month - 1]} ${d.year}';
@@ -55,7 +56,7 @@ TargetTip targetTip(String goal, double w, double t, double heightCm) {
         'Big changes take time. Talk to a doctor if you plan to lose this much.', (p) => p.chili);
   }
   if (t <= w) return TargetTip("Pick a weight above today's", '', 'Raise the number to set your goal.', (p) => p.danger);
-  if (tb > 25) {
+  if (tb > bmiHealthyMax) {
     return TargetTip('Gain ${pct.round()}%', bmiTxt, 'This goes above the healthy BMI range. A smaller gain may suit you better.', (p) => p.chili);
   }
   return TargetTip('Gain ${pct.round()}% lean weight', bmiTxt, 'Pair this with strength training and enough protein.', (p) => p.leaf);
@@ -129,9 +130,9 @@ class PacePicker extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('$l · ${v.toStringAsFixed(2)} kg / week',
+                      Text('$l · ${Units.pace(v)}',
                           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                      Muted('Reach ${target.toStringAsFixed(1)} kg by ${niceDate(d)}'),
+                      Muted('Reach ${Units.weight(target)} by ${niceDate(d)}'),
                     ]),
                   ),
                   if (on) Icon(Icons.check_circle, color: p.leaf),
@@ -165,8 +166,8 @@ class PacePicker extends StatelessWidget {
           TextSpan(children: [
             TextSpan(text: safe ? '✓ Safe pace. ' : '⚠ Too fast. ', style: const TextStyle(fontWeight: FontWeight.w800)),
             TextSpan(
-                text: 'I want to ${lose ? 'lose' : 'gain'} ${diff.toStringAsFixed(1)} kg in $days days, averaging '
-                    '${pace.toStringAsFixed(2)} kg per week.'),
+                text: 'I want to ${lose ? 'lose' : 'gain'} ${Units.weight(diff)} in $days days, averaging '
+                    '${Units.pace(pace).replaceAll(' / week', '')} per week.'),
           ]),
           style: TextStyle(color: safe ? p.ink : p.chili, height: 1.45),
         ),
@@ -247,7 +248,7 @@ class PlanGoalCard extends StatelessWidget {
           Pill(safe ? '✓ Safe pace' : '⚠ Fast pace', safe ? p.leaf : p.chili),
         ]),
         const SizedBox(height: 6),
-        Text('${lose ? '−' : '+'}${diff.toStringAsFixed(1)} kg', style: display(context, 34, weight: FontWeight.w700)),
+        Text('${lose ? '−' : '+'}${Units.weight(diff)}', style: display(context, 34, weight: FontWeight.w700)),
         const SizedBox(height: 2),
         Muted('to ${lose ? 'lose' : 'gain'} by ${niceDate(date)}'),
         const SizedBox(height: 12),
@@ -262,7 +263,7 @@ class PlanGoalCard extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Row(children: [
-          Expanded(child: StatTile('Weekly pace', '${pace.toStringAsFixed(2)} kg')),
+          Expanded(child: StatTile('Weekly pace', Units.pace(pace).replaceAll(' / week', ''))),
           const SizedBox(width: 8),
           Expanded(child: StatTile('Time', weeks >= 8 ? '${(weeks / 4.35).round()} months' : '${weeks.round()} weeks')),
           const SizedBox(width: 8),
@@ -348,12 +349,12 @@ class _PlanChartPainter extends CustomPainter {
     // start dot + pill
     canvas.drawCircle(pts[0], 6.5, Paint()..color = p.surface);
     canvas.drawCircle(pts[0], 6.5, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.5..color = c1);
-    _pill(canvas, '${from.toStringAsFixed(1)} kg', Offset(pts[0].dx + 30, lose ? pts[0].dy - 24 : pts[0].dy + 24), p.ink, p.surface);
+    _pill(canvas, Units.weight(from), Offset(pts[0].dx + 30, lose ? pts[0].dy - 24 : pts[0].dy + 24), p.ink, p.surface);
     if (k > .95) {
       final e = pts.last;
       canvas.drawCircle(e, 8, Paint()..color = c2);
       canvas.drawCircle(e, 8, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.5..color = p.surface);
-      _pill(canvas, '🎯 ${to.toStringAsFixed(1)} kg', Offset(e.dx - 44, gy - 28 < 2 ? gy + 26 : gy - 28), c2, Colors.white);
+      _pill(canvas, '🎯 ${Units.weight(to)}', Offset(e.dx - 44, gy - 28 < 2 ? gy + 26 : gy - 28), c2, Colors.white);
     }
     _text(canvas, 'Today', Offset(x0, size.height - 18), color: p.ink, w: FontWeight.w800);
     _text(canvas, '${end.day} ${_months[end.month - 1]}', Offset(x1, size.height - 18), color: p.ink, w: FontWeight.w800, right: true);

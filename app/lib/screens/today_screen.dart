@@ -18,6 +18,7 @@ import 'coach_screen.dart';
 import 'fasting_screen.dart';
 import 'report_screen.dart';
 import 'result_screen.dart';
+import '../services/units.dart';
 
 class TodayScreen extends StatefulWidget {
   final Profile profile;
@@ -229,10 +230,10 @@ class _TodayScreenState extends State<TodayScreen> {
                         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text.rich(TextSpan(children: [
                             TextSpan(
-                                text: '${(log.waterMl / 1000).toStringAsFixed(2)} L',
+                                text: Units.water(log.waterMl),
                                 style: TextStyle(fontWeight: FontWeight.w800, color: p.ink)),
                             TextSpan(
-                                text: log.waterMl >= g.waterMl ? '  Goal done ✓' : ' of ${(g.waterMl / 1000).toStringAsFixed(2)} L',
+                                text: log.waterMl >= g.waterMl ? '  Goal done ✓' : ' of ${Units.water(g.waterMl)}',
                                 style: TextStyle(color: log.waterMl >= g.waterMl ? p.leaf : p.muted, fontWeight: FontWeight.w700)),
                           ])),
                           const SizedBox(height: 8),
@@ -282,7 +283,7 @@ class _TodayScreenState extends State<TodayScreen> {
                             }),
                   const SizedBox(width: 8),
                   SquareIconButton(Icons.add,
-                      tooltip: 'Add a glass, 250 ml',
+                      tooltip: 'Add a glass, ${Units.glass()}',
                       fill: p.water,
                       iconColor: Colors.white,
                       onTap: () {
@@ -532,7 +533,7 @@ class _BurnedCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Muted(log.steps > 0
-                      ? '${stepKm(log.steps, profile.heightCm).toStringAsFixed(1)} km, tap to update'
+                      ? '${Units.dist(stepKm(log.steps, profile.heightCm))}, tap to update'
                       : 'Tap to sync or enter steps',
                       size: 12),
                 ]),

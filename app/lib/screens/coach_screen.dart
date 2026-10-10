@@ -10,6 +10,7 @@ import '../models.dart';
 import '../services/ai.dart';
 import '../services/db.dart';
 import '../services/goals.dart';
+import '../services/units.dart';
 import '../services/health_data.dart';
 import '../theme.dart';
 import '../widgets/ui.dart';
@@ -145,8 +146,8 @@ class _CoachSheetState extends State<CoachSheet> {
     final h = now.hour;
     return [
       'Time now: ${now.hour}:${now.minute.toString().padLeft(2, '0')} (${h < 12 ? 'morning' : h < 16 ? 'afternoon' : h < 20 ? 'evening' : 'night'})',
-      'User: ${p.name.isEmpty ? 'friend' : p.name}, ${p.sex}, ${p.age} yrs, ${p.heightCm.round()} cm, ${cur.toStringAsFixed(1)} kg, BMI ${b.toStringAsFixed(1)} (${bmiBandOf(b).name}, Asian-Indian ranges), activity: ${p.activity}',
-      'Goal: ${p.goal == 'lose' ? 'lose weight' : p.goal == 'gain' ? 'gain weight / build muscle' : 'maintain weight'}${p.goal != 'maintain' && p.targetWeightKg > 0 ? ', target ${p.targetWeightKg} kg${p.targetDate.isNotEmpty ? ' by ${p.targetDate}' : ''}' : ''}',
+      'User: ${p.name.isEmpty ? 'friend' : p.name}, ${p.sex}, ${p.age} yrs, ${Units.height(p.heightCm)}, ${Units.weight(cur)}, prefers ${Units.imperial ? 'lb, ft, oz, miles' : 'kg, cm, ml, km'}, time zone UTC${DateTime.now().timeZoneOffset.isNegative ? '-' : '+'}${DateTime.now().timeZoneOffset.inMinutes.abs() ~/ 60}, BMI ${b.toStringAsFixed(1)} (${bmiBandOf(b).name}, Asian-Indian ranges), activity: ${p.activity}',
+      'Goal: ${p.goal == 'lose' ? 'lose weight' : p.goal == 'gain' ? 'gain weight / build muscle' : 'maintain weight'}${p.goal != 'maintain' && p.targetWeightKg > 0 ? ', target ${Units.weight(p.targetWeightKg)}${p.targetDate.isNotEmpty ? ' by ${p.targetDate}' : ''}' : ''}',
       'Daily targets: ${g.kcal} kcal, protein ${g.protein} g, carbs ${g.carbs} g, fat ${g.fat} g, water ${g.waterMl} ml',
       'Eaten today: ${t.kcal.round()} kcal, protein ${t.protein.round()} g, carbs ${t.carbs.round()} g, fat ${t.fat.round()} g',
       'Left today: ${l.kcal.round()} kcal, protein ${l.protein.round()} g',

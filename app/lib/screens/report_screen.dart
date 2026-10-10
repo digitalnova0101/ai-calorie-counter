@@ -219,7 +219,7 @@ class _ReportScreenState extends State<ReportScreen> {
     c.drawCircle(const Offset(110, 110), 36, ring..color = p.plateTrack);
     c.drawArc(Rect.fromCircle(center: const Offset(110, 110), radius: 36), -math.pi / 2, math.pi * 1.5, false,
         ring..color = p.saffron);
-    text('AI Calorie Counter', const Offset(166, 112), disp.copyWith(fontSize: 36));
+    text('CalDay', const Offset(166, 112), disp.copyWith(fontSize: 36));
     text(_weekly ? 'Weekly report' : 'Daily report', const Offset(w - 80, 96), body.copyWith(fontSize: 32),
         align: TextAlign.right);
     text(_when, const Offset(w - 80, 140), body.copyWith(fontSize: 28, fontWeight: FontWeight.w600),
@@ -251,7 +251,7 @@ class _ReportScreenState extends State<ReportScreen> {
           Paint()..color = pt.color(p));
       y += _weekly ? 120 : 80;
     }
-    text('Tracked with AI Calorie Counter', const Offset(w / 2, h - 60), body.copyWith(fontSize: 28),
+    text('Tracked with CalDay', const Offset(w / 2, h - 60), body.copyWith(fontSize: 28),
         align: TextAlign.center);
 
     final image = await rec.endRecording().toImage(w.toInt(), h.toInt());

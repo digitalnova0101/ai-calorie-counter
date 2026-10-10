@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import '../services/goals.dart';
 import '../theme.dart';
+import '../services/units.dart';
 
 // ============================================================
 // Rings
@@ -214,7 +215,7 @@ class BmiGauge extends StatelessWidget {
     final b = bmi(weightKg, heightCm);
     final band = bmiBandOf(b);
     final h = heightCm / 100;
-    final minW = 18.5 * h * h, maxW = 22.9 * h * h;
+    final minW = 18.5 * h * h, maxW = (bmiHealthyMax - 0.1) * h * h;
     return Column(children: [
       AspectRatio(
         aspectRatio: 320 / 175,
@@ -239,11 +240,11 @@ class BmiGauge extends StatelessWidget {
       const SizedBox(height: 12),
       Text.rich(
         TextSpan(
-            text: 'Healthy weight for ${heightCm.round()} cm: ',
+            text: 'Healthy weight for ${Units.height(heightCm)}: ',
             style: TextStyle(color: p.muted, fontWeight: FontWeight.w600, fontSize: 13.5),
             children: [
               TextSpan(
-                  text: '${minW.round()}–${maxW.round()} kg',
+                  text: '${Units.toW(minW).round()}–${Units.toW(maxW).round()} ${Units.w}',
                   style: TextStyle(color: p.ink, fontWeight: FontWeight.w800)),
             ]),
         textAlign: TextAlign.center,
@@ -266,7 +267,7 @@ class BmiGauge extends StatelessWidget {
             .toList(),
       ),
       const SizedBox(height: 6),
-      Text('Using Asian-Indian BMI ranges.',
+      Text('Using $bmiRangesName.',
           style: TextStyle(color: p.muted, fontSize: 11.5)),
     ]);
   }
@@ -299,7 +300,7 @@ class _GaugePainter extends CustomPainter {
             ..strokeCap = StrokeCap.round);
       prev = end;
     }
-    for (final t in [18.5, 23.0, 25.0]) {
+    for (final t in [bmiEdges[1], bmiEdges[2], bmiEdges[3]]) {
       final a = ang(t);
       final tp = TextPainter(
         text: TextSpan(

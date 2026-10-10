@@ -131,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  Text('AI Calorie Counter',
+                  Text('CalDay',
                       textAlign: TextAlign.center, style: display(context, 26)),
                   const SizedBox(height: 6),
                   Muted(

@@ -7,7 +7,7 @@ import '../theme.dart';
 import '../widgets/ui.dart';
 import 'result_screen.dart';
 
-/// Search the built-in Indian food list and build a plate.
+/// Search the built-in food list and build a plate.
 class SearchScreen extends StatefulWidget {
   final DateTime date;
   const SearchScreen({super.key, required this.date});
@@ -64,7 +64,7 @@ class _SearchScreenState extends State<SearchScreen> {
             autofocus: true,
             onChanged: _search,
             decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search), hintText: 'Search roti, dal, paneer'),
+                prefixIcon: Icon(Icons.search), hintText: 'Search eggs, rice, pizza, dal…'),
           ),
         ),
         if (q.isNotEmpty)

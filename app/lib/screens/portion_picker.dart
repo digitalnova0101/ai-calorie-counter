@@ -11,18 +11,19 @@ class _Unit {
 }
 
 const _units = <_Unit>[
-  _Unit('katori', 'Katori', '🥣', 150, '150 g'),
-  _Unit('small', 'Small katori', '🥣', 100, '100 g'),
+  _Unit('piece', 'Piece / serving', '🍽️', null, 'as shown'),
+  _Unit('katori', 'Small bowl', '🥣', 150, '150 g'),
+  _Unit('bowl', 'Large bowl', '🥣', 300, '300 g'),
   _Unit('plate', 'Full plate', '🍽️', 300, '300 g'),
   _Unit('half', 'Half plate', '🍽️', 150, '150 g'),
+  _Unit('cup', 'Cup', '☕', 240, '240 ml'),
   _Unit('glass', 'Glass', '🥛', 250, '250 ml'),
-  _Unit('cup', 'Cup', '☕', 150, '150 ml'),
-  _Unit('piece', 'Piece / serving', '🫓', null, 'as shown'),
   _Unit('tbsp', 'Tablespoon', '🥄', 15, '15 g'),
+  _Unit('oz', 'Ounces', '⚖️', 28.35, '28 g each'),
   _Unit('gram', 'Grams', '⚖️', 1, 'exact'),
 ];
 
-/// Indian portion picker. Returns true when the item was changed.
+/// Portion picker (bowls, cups, plates, ounces or grams). Returns true when the item was changed.
 Future<bool?> showPortionPicker(BuildContext context, FoodItem item) =>
     showAppSheet<bool>(context, (_) => _PortionSheet(item: item));
 
@@ -68,6 +69,7 @@ class _PortionSheetState extends State<_PortionSheet> {
     if (RegExp(r'glass|ml').hasMatch(p)) return 'glass';
     if (p.contains('cup')) return 'cup';
     if (p.contains('plate')) return 'plate';
+    if (RegExp(r'large bowl|big bowl').hasMatch(p)) return 'bowl';
     if (RegExp(r'bowl|katori').hasMatch(p)) return 'katori';
     if (RegExp(r'tbsp|spoon').hasMatch(p)) return 'tbsp';
     return 'piece';

@@ -1,8 +1,8 @@
-// AI food scan for the AI Calorie Counter app (runs on Vercel).
+// AI food scan for the CalDay app (runs on Vercel).
 // The Gemini key lives only here (Vercel → Settings → Environment Variables → GEMINI_API_KEY).
 // Only signed-in app users can call it: we check their Firebase sign-in token.
 //
-// Speed: the app sends the names in its Indian food list. For foods in that list
+// Speed: the app sends the names in its built-in food list. For foods in that list
 // the AI only replies {"db": name, "grams": n}; the app fills in the numbers.
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
@@ -14,14 +14,14 @@ const usage = new Map(); // best-effort per-user daily count (per server instanc
 
 function schema(dbNames) {
   const list = dbNames.length
-    ? `\nIf a food matches a name in THALI LIST, use the short form {"db": "<exact list name>", "grams": <grams eaten>, "portion": "2 medium"}.\nTHALI LIST: ${dbNames.join("; ")}`
+    ? `\nIf a food matches a name in FOOD LIST, use the short form {"db": "<exact list name>", "grams": <grams eaten>, "portion": "2 medium"}.\nFOOD LIST: ${dbNames.join("; ")}`
     : "";
   return `Reply with ONLY one JSON object, no other text:
 {"dish": "short meal name",
  "items": [ {"name": "Food name", "portion": "1 bowl", "grams": 150, "kcal": 210, "protein": 9, "carbs": 30, "fat": 6} ],
  "note": "one short simple-English sentence about assumptions (oil, portion size)"}
 Numbers are for the whole portion eaten, not per 100 g. Protein, carbs and fat in grams.
-Use Indian home-cooking norms (IFCT values, typical recipes) and include cooking oil or ghee.${list}
+First recognise the cuisine (Indian, American, Mexican, Chinese, Japanese, Italian, Middle Eastern and so on), then use typical recipes and standard nutrition data for that cuisine (USDA for Western foods, IFCT for Indian foods). Include cooking oil, butter, ghee or dressing. Use the common English food name, keeping well-known local names (for example \"Dal tadka\", \"Pad thai\").${list}
 If there is no food, return {"dish":"","items":[],"note":"No food found."}`;
 }
 
@@ -80,9 +80,9 @@ module.exports = async (req, res) => {
   if (!hasImage && !hasText) return res.status(400).json({ error: "Send a photo or a description." });
   if (hasImage && imageBase64.length > MAX_IMAGE_BASE64) return res.status(400).json({ error: "Photo is too large. Try again." });
 
-  const intro = "You are a nutrition estimator for an Indian calorie tracking app.\n";
+  const intro = "You are a nutrition estimator for a calorie tracking app used worldwide.\n";
   const parts = hasImage
-    ? [{ text: intro + "Look at this food photo. Identify each distinct food item and estimate its portion from visual cues (plate, katori, hand size).\n\n" + schema(dbNames) },
+    ? [{ text: intro + "Look at this food photo. Identify each distinct food item and estimate its portion from visual cues (plate, bowl, cup, katori, cutlery, hand size).\n\n" + schema(dbNames) },
        { inline_data: { mime_type: "image/jpeg", data: imageBase64 } }]
     : [{ text: intro + `The user ate: "${text.trim().slice(0, 500)}". Split it into items and estimate each. If a quantity is missing, assume one normal serving.\n\n` + schema(dbNames) }];
 

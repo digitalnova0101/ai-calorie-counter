@@ -39,7 +39,8 @@ double bmi(double weightKg, double heightCm) {
   return m <= 0 ? 0.0 : weightKg / (m * m);
 }
 
-/// Asian-Indian BMI cut-offs.
+/// BMI bands. South and East Asia use the lower Asian cut-offs (WHO expert
+/// panel); everyone else uses the standard WHO ranges.
 class BmiBand {
   final double max;
   final String name;
@@ -47,12 +48,29 @@ class BmiBand {
   const BmiBand(this.max, this.name, this.color);
 }
 
-final bmiBands = <BmiBand>[
+final _asianBands = <BmiBand>[
   BmiBand(18.5, 'Underweight', (p) => p.water),
   BmiBand(23, 'Healthy', (p) => p.leaf),
   BmiBand(25, 'Overweight', (p) => p.wheat),
   BmiBand(99, 'Obese', (p) => p.chili),
 ];
+final _whoBands = <BmiBand>[
+  BmiBand(18.5, 'Underweight', (p) => p.water),
+  BmiBand(25, 'Healthy', (p) => p.leaf),
+  BmiBand(30, 'Overweight', (p) => p.wheat),
+  BmiBand(99, 'Obese', (p) => p.chili),
+];
+
+/// True on phones set to a South or East Asian time zone (UTC+5 to UTC+9).
+bool get asianBmi {
+  final m = DateTime.now().timeZoneOffset.inMinutes;
+  return m >= 300 && m <= 540;
+}
+
+List<BmiBand> get bmiBands => asianBmi ? _asianBands : _whoBands;
+double get bmiHealthyMax => asianBmi ? 23 : 25;
+List<double> get bmiEdges => asianBmi ? const [15.0, 18.5, 23.0, 25.0, 35.0] : const [15.0, 18.5, 25.0, 30.0, 40.0];
+String get bmiRangesName => asianBmi ? 'Asian BMI ranges' : 'WHO BMI ranges';
 BmiBand bmiBandOf(double b) => bmiBands.firstWhere((x) => b < x.max);
 
 // ---------------- calories burned ----------------
@@ -121,7 +139,6 @@ class Score {
 
 String fmtInt(num n) {
   final s = n.round().toString();
-  // Indian-style grouping is fine for small numbers; keep simple commas
   final b = StringBuffer();
   for (var i = 0; i < s.length; i++) {
     if (i > 0 && (s.length - i) % 3 == 0) b.write(',');
@@ -162,7 +179,7 @@ Score dayScore(DayLog d, Profile p) {
   }
   if (t.protein < g.protein * 0.8) {
     tips.add(((c) => c.leaf,
-        '${(g.protein - t.protein).round()} g protein to go. Paneer, eggs, dal, curd or chicken help.'));
+        '${(g.protein - t.protein).round()} g protein to go. Eggs, chicken, fish, Greek yogurt, beans or tofu help.'));
   }
   if (d.steps < stepGoalOf(p)) {
     final left = stepGoalOf(p) - d.steps;

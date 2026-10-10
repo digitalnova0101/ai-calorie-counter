@@ -6,6 +6,7 @@ import '../services/device.dart';
 import '../services/goals.dart';
 import '../theme.dart';
 import '../widgets/ui.dart';
+import '../services/units.dart';
 
 // ============================================================
 // Add / edit workout
@@ -136,7 +137,7 @@ class _WorkoutSheetState extends State<_WorkoutSheet> {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-                Muted('$_min min at ${widget.profile.weightKg.round()} kg'),
+                Muted('$_min min at ${Units.weight(widget.profile.weightKg, 0)}'),
               ]),
             ),
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -277,7 +278,7 @@ class _StepsSheetState extends State<_StepsSheet> {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${stepKm(_steps, widget.profile.heightCm).toStringAsFixed(1)} km',
+                Text(Units.dist(stepKm(_steps, widget.profile.heightCm)),
                     style: const TextStyle(fontWeight: FontWeight.w800)),
                 const Muted('about'),
               ]),

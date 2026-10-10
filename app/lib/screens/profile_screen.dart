@@ -11,6 +11,7 @@ import '../widgets/premium.dart';
 import '../widgets/ui.dart';
 import 'auth_screen.dart';
 import 'onboarding_screen.dart';
+import '../services/units.dart';
 
 class ProfileScreen extends StatefulWidget {
   final Profile profile;
@@ -139,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(prof.name.isEmpty ? 'You' : prof.name, style: display(context, 20, weight: FontWeight.w700)),
-              Muted('${goalText[prof.goal] ?? ''}${prof.goal != 'maintain' ? ', target ${prof.targetWeightKg.toStringAsFixed(1)} kg' : ''}'),
+              Muted('${goalText[prof.goal] ?? ''}${prof.goal != 'maintain' ? ', target ${Units.weight(prof.targetWeightKg)}' : ''}'),
               if (email.isNotEmpty) Muted(email, size: 12),
             ]),
           ),
@@ -154,8 +155,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           BmiCard(weightKg: prof.weightKg, heightCm: prof.heightCm),
           const SizedBox(height: 8),
           kv('Age', '${prof.age} yrs'),
-          kv('Height', '${prof.heightCm.round()} cm'),
-          kv('Weight', '${prof.weightKg.toStringAsFixed(1)} kg'),
+          kv('Height', Units.height(prof.heightCm)),
+          kv('Weight', Units.weight(prof.weightKg)),
+          const SizedBox(height: 10),
+          Row(children: [
+            const Expanded(child: Text('Units', style: TextStyle(fontWeight: FontWeight.w800))),
+            SegmentedButton<bool>(
+              showSelectedIcon: false,
+              style: const ButtonStyle(visualDensity: VisualDensity.compact),
+              segments: const [
+                ButtonSegment(value: false, label: Text('kg · cm')),
+                ButtonSegment(value: true, label: Text('lb · ft')),
+              ],
+              selected: {Units.imperial},
+              onSelectionChanged: (v) => Db.instance.setUnits(v.first ? 'imperial' : 'metric'),
+            ),
+          ]),
         ]),
       ),
       const SizedBox(height: 12),
@@ -166,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           kv('Protein', '${g.protein} g'),
           kv('Carbs', '${g.carbs} g'),
           kv('Fat', '${g.fat} g'),
-          kv('Water', '${(g.waterMl / 1000).toStringAsFixed(1)} L'),
+          kv('Water', Units.water(g.waterMl)),
         ]),
       ),
       const SizedBox(height: 12),
@@ -183,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('Daily step goal', style: TextStyle(fontWeight: FontWeight.w800)),
-                Muted('8,000 is a good start', size: 12),
+                Muted('Set for your goal', size: 12),
               ]),
             ),
             SizedBox(

@@ -9,10 +9,11 @@ import '../services/goals.dart';
 import '../theme.dart';
 import 'graphics.dart';
 import 'ui.dart';
+import '../services/units.dart';
 
 Color tint(Color c, double a, Color on) => Color.alphaBlend(c.withValues(alpha: a), on);
 
-String kg(double v) => '${v.toStringAsFixed(1)} kg';
+String kg(double v) => Units.weight(v);
 
 /// Small grey label in capitals with wide letter spacing.
 class Eyebrow extends StatelessWidget {
@@ -156,10 +157,10 @@ class BmiCard extends StatelessWidget {
     final p = Palette.of(context);
     final b = bmi(weightKg, heightCm), band = bmiBandOf(b), bc = band.color(p);
     final bi = bmiBands.indexOf(band);
-    const edges = [15.0, 18.5, 23.0, 25.0, 35.0];
+    final edges = bmiEdges;
     final pos = (bi + ((b.clamp(edges[bi], edges[bi + 1]) - edges[bi]) / (edges[bi + 1] - edges[bi]))).clamp(0.0, 4.0);
     final left = (pos / 4).clamp(0.04, 0.96);
-    final h = heightCm / 100, minW = 18.5 * h * h, maxW = 22.9 * h * h;
+    final h = heightCm / 100, minW = 18.5 * h * h, maxW = (bmiHealthyMax - 0.1) * h * h;
     final over = weightKg - maxW, under = minW - weightKg;
     final msg = over > 0
         ? "You're ${kg(over)} above your healthy range."
@@ -198,7 +199,7 @@ class BmiCard extends StatelessWidget {
       ),
       const SizedBox(height: 12),
       Row(children: [
-        Expanded(child: StatTile('Healthy range', '${minW.toStringAsFixed(0)}–${maxW.toStringAsFixed(0)} kg')),
+        Expanded(child: StatTile('Healthy range', '${Units.toW(minW).toStringAsFixed(0)}–${Units.toW(maxW).toStringAsFixed(0)} ${Units.w}')),
         const SizedBox(width: 10),
         Expanded(
           child: StatTile(over > 0 || under > 0 ? 'To reach it' : 'Your weight',
@@ -207,7 +208,7 @@ class BmiCard extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 8),
-      Muted('Asian-Indian BMI ranges · ${heightCm.round()} cm', size: 12),
+      Muted('$bmiRangesName · ${Units.height(heightCm)}', size: 12),
     ]);
   }
 }
@@ -267,7 +268,7 @@ class _BmiScale extends StatelessWidget {
                   ),
                 ]),
               ),
-              for (final (t, f) in const [('Under', 0.0), ('18.5', .25), ('23', .5), ('25', .75), ('Obese', 1.0)])
+              for (final (t, f) in [('Under', 0.0), ('18.5', .25), (bmiEdges[2].toStringAsFixed(0), .5), (bmiEdges[3].toStringAsFixed(0), .75), ('Obese', 1.0)])
                 Positioned(
                   top: 56,
                   left: f == 0 ? 0 : (f == 1 ? null : w * f - 16),
@@ -370,28 +371,28 @@ class GoalProgressCard extends StatelessWidget {
           ])),
         ]),
         const SizedBox(height: 12),
-        _paceRow(context, "Your plan's pace", '${m.perWeek.toStringAsFixed(2)} kg / week', _paceTag(context, m.perWeek, lose)),
+        _paceRow(context, "Your plan's pace", Units.pace(m.perWeek), _paceTag(context, m.perWeek, lose)),
         const SizedBox(height: 10),
         _paceRow(
             context,
             'Your real pace (from weigh-ins)',
-            m.realPace == null ? 'Log a week of weights' : '${m.realPace!.abs().toStringAsFixed(2)} kg / week',
+            m.realPace == null ? 'Log a week of weights' : Units.pace(m.realPace!.abs()),
             _paceTag(context, m.realPace, lose)),
         const SizedBox(height: 14),
         if (lose) ...[
-          NoteBox('⚖️', '1 kg of body fat ≈ 7,700 kcal.',
-              'To lose 1 kg you need to burn about 7,700 kcal more than you eat. Your goal of ${kg(m.totalKg)} means about ${fmtInt(m.totalKg * kcalPerKg)} kcal in total.',
+          NoteBox('⚖️', Units.imperial ? '1 lb of body fat ≈ 3,500 kcal.' : '1 kg of body fat ≈ 7,700 kcal.',
+              '${Units.imperial ? 'To lose 1 lb you need to burn about 3,500 kcal' : 'To lose 1 kg you need to burn about 7,700 kcal'} more than you eat. Your goal of ${kg(m.totalKg)} means about ${fmtInt(m.totalKg * kcalPerKg)} kcal in total.',
               p.wheat),
           const SizedBox(height: 10),
-          NoteBox('✅', '0.5 kg a week is a safe weight loss.',
-              "That's a deficit of about 550 kcal a day. Up to 1 kg a week is the safe upper limit; faster than that can cost muscle and is hard to keep off.",
+          NoteBox('✅', Units.imperial ? '1 lb a week is a safe weight loss.' : '0.5 kg a week is a safe weight loss.',
+              "That's a deficit of about 500 kcal a day. Up to ${Units.imperial ? '2 lb' : '1 kg'} a week is the safe upper limit; faster than that can cost muscle and is hard to keep off.",
               p.leaf),
         ] else ...[
-          NoteBox('⚖️', 'Gaining 1 kg needs about 7,700 kcal',
+          NoteBox('⚖️', Units.imperial ? 'Gaining 1 lb needs about 3,500 kcal' : 'Gaining 1 kg needs about 7,700 kcal',
               'more eaten than burned. With strength training, more of that goes into muscle instead of fat. Your goal of ${kg(m.totalKg)} means about ${fmtInt(m.totalKg * kcalPerKg)} kcal extra in total.',
               p.wheat),
           const SizedBox(height: 10),
-          NoteBox('✅', '0.25 to 0.5 kg a week is a healthy, lean gain.',
+          NoteBox('✅', Units.imperial ? '0.5 to 1 lb a week is a healthy, lean gain.' : '0.25 to 0.5 kg a week is a healthy, lean gain.',
               "That's a surplus of about 250 to 500 kcal a day plus enough protein. Gaining faster mostly adds fat.",
               p.leaf),
         ],

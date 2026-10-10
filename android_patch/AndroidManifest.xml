@@ -19,7 +19,7 @@
     </queries>
 
     <application
-        android:label="AI Calorie Counter"
+        android:label="CalDay"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

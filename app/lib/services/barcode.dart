@@ -32,7 +32,7 @@ Future<Product?> lookupBarcode(String code) async {
       'https://world.openfoodfacts.org/api/v2/product/${Uri.encodeComponent(code)}.json'
       '?fields=product_name,brands,nutriments,serving_quantity');
   final res = await http.get(uri, headers: {
-    'User-Agent': 'ThaliApp/1.0 (calorie tracker)',
+    'User-Agent': 'CalDay/1.0 (calorie tracker)',
   }).timeout(const Duration(seconds: 15));
   if (res.statusCode == 404) return null;
   if (res.statusCode != 200) {

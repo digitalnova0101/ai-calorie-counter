@@ -269,7 +269,7 @@ class _ResultScreenState extends State<ResultScreen> {
                 : 'Add to $_type${dayKey(widget.date) != dayKey(DateTime.now()) ? ', ${DateFormatShort.of(widget.date)}' : ''}'),
           ),
         ),
-        const Muted('Tap a portion to pick katori, plate or glass. AI numbers can be about 20% off.',
+        const Muted('Tap a portion to pick a bowl, cup, plate or grams. AI numbers can be about 20% off.',
             size: 12, align: TextAlign.center),
       ]);
     }
