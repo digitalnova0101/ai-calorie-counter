@@ -57,4 +57,4 @@ The test description was: bars30
 LAYOUT PROBLEMS: 0
 ::endgroup::
 
-::error::0 tests passed, 15 failed.
+::error::0 tests passed, 19 failed.
