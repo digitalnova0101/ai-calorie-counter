@@ -138,6 +138,18 @@ void main() {
   testWidgets('body_lb', (t) async => screenShot(t, 'body_lb', OnboardingScreen(initial: imp('imperial'), startStep: 1)));
   testWidgets('target_lb', (t) async => screenShot(t, 'target_lb', OnboardingScreen(initial: imp('imperial'), startStep: 4)));
   testWidgets('date_lb', (t) async => screenShot(t, 'date_lb', OnboardingScreen(initial: imp('imperial'), startStep: 5)));
+  testWidgets('plan_lb', (t) async => screenShot(t, 'plan_lb', OnboardingScreen(initial: imp('imperial'), startStep: 8)));
+  testWidgets('body_next', (t) async {
+    // tap Continue on the body step: must move to the next step without errors
+    await screenShot(t, 'body_next_before', OnboardingScreen(initial: imp('imperial'), startStep: 1));
+    await t.tap(find.text('Continue'));
+    await t.pump(const Duration(seconds: 1));
+    await t.tap(find.text('Continue'));
+    await t.pump(const Duration(seconds: 1));
+    await t.tap(find.text('Continue'));
+    await t.pump(const Duration(seconds: 1));
+    await expectLater(find.byType(OnboardingScreen), matchesGoldenFile('goldens/body_next_after.png'));
+  });
   testWidgets('body_kg', (t) async => screenShot(t, 'body_kg', OnboardingScreen(initial: imp('metric'), startStep: 1)));
   testWidgets('bars', (t) async => shot(t, 'bars',
       BarChart(labels: const ['Sa', 'Su', 'Mo', 'Tu', 'We', 'Th', 'Fr'], values: const [0, 0, 0, 0, 0, 0, 10791],

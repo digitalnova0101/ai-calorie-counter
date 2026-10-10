@@ -63,9 +63,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   static int _inchesOf(double cm) => (cm / Units.cmPerIn).round();
   String _fmtW(double kg) =>
       _fmt(_imperial ? (kg * Units.lbPerKg).roundToDouble() : (kg * 2).roundToDouble() / 2);
-  double get _hCm => _imperial ? (_num(_ft) * 12 + _num(_in)) * Units.cmPerIn : _hCm;
-  double get _wKg => _imperial ? _wKg / Units.lbPerKg : _wKg;
-  double get _tKg => _imperial ? _tKg / Units.lbPerKg : _tKg;
+  double get _hCm => _imperial ? (_num(_ft) * 12 + _num(_in)) * Units.cmPerIn : _num(_height);
+  double get _wKg => _imperial ? _num(_weight) / Units.lbPerKg : _num(_weight);
+  double get _tKg => _imperial ? _num(_target) / Units.lbPerKg : _num(_target);
 
   void _setImperial(bool v) {
     if (v == _imperial) return;
