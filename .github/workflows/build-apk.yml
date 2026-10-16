@@ -41,7 +41,7 @@ jobs:
             flutter create --org com.digitalnova --project-name aicaloriecounter --platforms android .
             rm -f test/widget_test.dart
             python3 ../tools/patch_android.py
-            python3 ../tools/make_firebase_options.py ../google-services.json lib/firebase_options.dart com.digitalnova.aicaloriecounter
+            python3 ../tools/make_firebase_options.py ../google-services.json lib/firebase_options.dart com.moezzadigital.calday
             flutter pub get
             if [ -n "$UPLOAD_KEYSTORE_BASE64" ]; then
               echo "$UPLOAD_KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks

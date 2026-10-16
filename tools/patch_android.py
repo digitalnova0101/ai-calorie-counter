@@ -17,6 +17,9 @@ for f in glob.glob(os.path.join(app, "src", "main", "kotlin", "**", "MainActivit
 g = os.path.join(app, "build.gradle.kts")
 s = open(g).read()
 s = re.sub(r"minSdk\s*=\s*[^\n]+", "minSdk = 26", s, count=1)
+# Play Store app ID (the code namespace stays com.digitalnova.aicaloriecounter; users never see either)
+APP_ID = os.environ.get("APP_ID", "com.moezzadigital.calday")
+s = re.sub(r'applicationId\s*=\s*"[^"]*"', f'applicationId = "{APP_ID}"', s, count=1)
 if "isCoreLibraryDesugaringEnabled" not in s:
     s = s.replace("compileOptions {", "compileOptions {\n        isCoreLibraryDesugaringEnabled = true", 1)
 if "desugar_jdk_libs" not in s:
