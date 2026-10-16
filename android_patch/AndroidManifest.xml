@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- steps from Health Connect -->
     <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <!-- lets the app find the Health Connect app -->
     <queries>
